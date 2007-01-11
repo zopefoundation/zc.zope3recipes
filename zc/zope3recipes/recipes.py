@@ -287,9 +287,7 @@ class Instance:
             raise
 
 
-    def update(self):
-        pass
-
+    update = install
 
 def access_log(path):
     return ZConfigSection(
