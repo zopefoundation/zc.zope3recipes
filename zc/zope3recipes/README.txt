@@ -706,14 +706,15 @@ Let's look at the zdaemon.conf file:
     >>> cat('parts', 'instance', 'zdaemon.conf') 
     <runner>
       daemon on
+      directory /sample-buildout/parts/instance
       program /sample-buildout/parts/myapp/runzope -C /sample-buildout/parts/instance/zope.conf
-      socket-name /sample-buildout/parts/instance/zopectl.sock
+      socket-name /sample-buildout/parts/instance/zdaemon.sock
       transcript /sample-buildout/parts/instance/z3.log
     </runner>
     <BLANKLINE>
     <eventlog>
       <logfile>
-        path z3.log
+        path /sample-buildout/parts/instance/z3.log
       </logfile>
     <BLANKLINE>
     </eventlog>
@@ -781,6 +782,7 @@ simply provide a zdaemon.conf option in your instance section:
     >>> cat('parts', 'instance', 'zdaemon.conf')
     <runner>
       daemon off
+      directory /sample-buildout/parts/instance
       program /sample-buildout/parts/myapp/runzope -C /sample-buildout/parts/instance/zope.conf
       socket-name /sample-buildout/parts/instance/sock
       transcript /dev/null
@@ -838,3 +840,173 @@ information as well as Zope error output into a single log file.  We
 do this by directing Zope's event log to standard output, where it is
 useful when running Zope in foreground mode and where it can be
 captured by the zdaemon transscript log.
+
+Unix Deployments
+----------------
+
+The instance recipe provides support for Unix deployments, as provided
+by the zc.recipe.deployment recipe.  A deployment part defines a number of
+options used by the instance recipe:
+
+etc-directory
+    The name of the directory where configurtion files should be
+    placed.  This defaults to /etc/NAME, where NAME is the deployment
+    name. 
+
+log-directory
+    The name of the directory where application instances should write
+    their log files.  This defaults to /var/log/NAME, where NAME is
+    the deployment name.
+
+run-directory
+    The name of the directory where application instances should put
+    their run-time files such as pid files and inter-process
+    communication socket files.  This defaults to /var/run/NAME, where
+    NAME is the deployment name.
+
+rc-directory
+    The name of the directory where run-control scripts should be
+    installed.
+
+user
+    The name of a user that processes should run as.
+
+The deployment recipe has to be run as root for various reasons, but
+we can create a faux deployment by providing a section with the needed
+data. Let's update our configuration to use a deployment.  We'll first
+create a faux installation root:
+
+    >>> root = tmpdir('root')
+    >>> mkdir(root, 'etc')
+    >>> mkdir(root, 'etc', 'myapp-run')
+    >>> mkdir(root, 'etc', 'init.d')
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance
+    ... 
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... application = myapp
+    ... zope.conf = ${database:zconfig}
+    ... address = 8081
+    ... deployment = myapp-run
+    ...
+    ... [database]
+    ... recipe = zc.recipe.filestorage
+    ...
+    ... [myapp-run]
+    ... etc-directory = %(root)s/etc/myapp-run
+    ... rc-directory = %(root)s/etc/init.d
+    ... log-directory = %(root)s/var/log/myapp-run
+    ... run-directory = %(root)s/var/run/myapp-run
+    ... user = zope
+    ... ''' % globals())
+
+Here we've added a deployment section, myapp-run, and added a
+deployment option to our instance part telling the instance recipe to
+use the deployment.  If we rerun the buildout:
+
+    >>> print system(join('bin', 'buildout')),
+    buildout: Develop: /sample-buildout/demo1
+    buildout: Develop: /sample-buildout/demo2
+    buildout: Uninstalling instance
+    buildout: Updating database
+    buildout: Updating myapp
+    buildout: Installing instance
+
+The installe files will move.  We'll no-longer have the instance part:
+
+    >>> ls('parts')
+    d  database
+    d  myapp
+
+or the control script:
+
+    >>> ls('bin')
+    -  buildout
+
+Rather, we'll get our configuration files in the /etc/myapp-run directory:
+
+    >>> ls(root, 'etc', 'myapp-run')
+    -  instance-zdaemon.conf
+    -  instance-zope.conf
+
+Note that the instance name was added as a prefix to the file names,
+since we'll typically have additional instances in the deployment.
+
+The control script is in the init.d directory:
+
+    >>> ls(root, 'etc', 'init.d')
+    -  instance
+
+and the configuration files will be changed to reflect the deployment
+locations:
+
+    >>> cat(root, 'etc', 'myapp-run', 'instance-zope.conf')
+    site-definition /sample-buildout/parts/myapp/site.zcml
+    <BLANKLINE>
+    <zodb>
+      <filestorage>
+        path /sample-buildout/parts/database/Data.fs
+      </filestorage>
+    <BLANKLINE>
+    </zodb>
+    <BLANKLINE>
+    <server>
+      address 8081
+      type HTTP
+    </server>
+    <BLANKLINE>
+    <accesslog>
+      <logfile>
+        path /root/var/log/myapp-run/instance-access.log
+      </logfile>
+    <BLANKLINE>
+    </accesslog>
+    <BLANKLINE>
+    <eventlog>
+      <logfile>
+        formatter zope.exceptions.log.Formatter
+        path STDOUT
+      </logfile>
+    <BLANKLINE>
+    </eventlog>
+
+    >>> cat(root, 'etc', 'myapp-run', 'instance-zdaemon.conf')
+    <runner>
+      daemon on
+      directory /root/var/run/myapp-run
+      program /sample-buildout/parts/myapp/runzope -C /root/etc/myapp-run/instance-zope.conf
+      socket-name /root/var/run/myapp-run/instance-zdaemon.sock
+      transcript /root/var/log/myapp-run/instance-z3.log
+      user zope
+    </runner>
+    <BLANKLINE>
+    <eventlog>
+      <logfile>
+        path /root/var/log/myapp-run/instance-z3.log
+      </logfile>
+    <BLANKLINE>
+    </eventlog>

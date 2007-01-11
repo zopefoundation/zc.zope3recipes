@@ -129,106 +129,133 @@ class Instance:
     def __init__(self, buildout, name, options):
         self.name, self.options = name, options
 
-        options['location'] = os.path.join(
-            buildout['buildout']['parts-directory'],
-            self.name,
-            )
-
         options['application-location'] = buildout[options['application']
                                                    ]['location']
-
-        options['bin-directory'] = buildout['buildout']['bin-directory']
 
         options['scripts'] = ''
         options['eggs'] = options.get('eggs', 'zdaemon\nsetuptools')
         self.egg = zc.recipe.egg.Egg(buildout, name, options)
+
+        deployment = self.deployment = options.get('deployment')
+        if deployment:
+            options['bin-directory'] = buildout[deployment]['rc-directory']
+            options['run-directory'] = buildout[deployment]['run-directory']
+            options['log-directory'] = buildout[deployment]['log-directory']
+            options['etc-directory'] = buildout[deployment]['etc-directory']
+            options['user'] = buildout[deployment]['user']
+        else:
+            options['bin-directory'] = buildout['buildout']['bin-directory']
+            options['run-directory'] = os.path.join(
+                buildout['buildout']['parts-directory'],
+                self.name,
+                )
+            
             
 
     def install(self):
         options = self.options
-        dest = conf_dir = log_dir = run_dir = options['location']
-        app_loc = options['application-location']
-
-        zope_conf_path = os.path.join(dest, 'zope.conf')
-        zdaemon_conf_path = os.path.join(dest, 'zdaemon.conf')
-
-        zope_conf = options.get('zope.conf', '')+'\n'
-        zope_conf = ZConfigParse(cStringIO.StringIO(zope_conf))
-        
-        zope_conf['site-definition'] = os.path.join(app_loc, 'site.zcml')
-
-        for address in options.get('address', '').split():
-            zope_conf.sections.append(
-                ZConfigSection('server',
-                               data=dict(type='HTTP',
-                                         address=address,
-                                         ),
-                               )
-                )
-        if not [s for s in zope_conf.sections
-                if ('server' in s.type)]:
-            zope_conf.sections.append(
-                ZConfigSection('server',
-                               data=dict(type='HTTP',
-                                         address='8080',
-                                         ),
-                               )
-                )
-
-        if not [s for s in zope_conf.sections if s.type == 'zodb']:
-            raise zc.buildout.UserError(
-                'No database sections have been defined.')
-
-        if not [s for s in zope_conf.sections
-                if s.type == 'accesslog']:
-            zope_conf.sections.append(
-                access_log(os.path.join(log_dir, 'access.log')))
-
-                
-        if not [s for s in zope_conf.sections
-                if s.type == 'eventlog']:
-            zope_conf.sections.append(event_log('STDOUT'))
 
 
-        zdaemon_conf = options.get('zdaemon.conf', '')+'\n'
-        zdaemon_conf = ZConfigParse(cStringIO.StringIO(zdaemon_conf))
-
-        defaults = {
-            'program': "%s -C %s" % (os.path.join(app_loc, 'runzope'),
-                                     zope_conf_path,
-                                     ),
-            'daemon': 'on',
-            'transcript': os.path.join(log_dir, 'z3.log'),
-            'socket-name': os.path.join(run_dir, 'zopectl.sock'),
-            }
-        runner = [s for s in zdaemon_conf.sections
-                  if s.type == 'runner']
-        if runner:
-            runner = runner[0]
+        run_directory = options['run-directory']
+        deployment = self.deployment
+        if deployment:
+            zope_conf_path = os.path.join(options['etc-directory'],
+                                          self.name+'-zope.conf')
+            zdaemon_conf_path = os.path.join(options['etc-directory'],
+                                             self.name+'-zdaemon.conf')
+            event_log_path = os.path.join(options['log-directory'],
+                                          self.name+'-z3.log')
+            access_log_path = os.path.join(options['log-directory'],
+                                           self.name+'-access.log')
+            socket_path = os.path.join(run_directory,
+                                       self.name+'-zdaemon.sock')
+            creating = [zope_conf_path, zdaemon_conf_path,
+                        os.path.join(options['bin-directory'], self.name),
+                        ]
         else:
-            runner = ZConfigSection('runner')
-            zdaemon_conf.sections.insert(0, runner)
-        for name, value in defaults.items():
-            if name not in runner:
-                runner[name] = value
-        
-        if not [s for s in zdaemon_conf.sections
-                if s.type == 'eventlog']:
-            # No database, specify a default one
-            zdaemon_conf.sections.append(event_log2('z3.log'))
+            zope_conf_path = os.path.join(run_directory, 'zope.conf')
+            zdaemon_conf_path = os.path.join(run_directory, 'zdaemon.conf')
+            event_log_path = os.path.join(run_directory, 'z3.log')
+            access_log_path = os.path.join(run_directory, 'access.log')
+            socket_path = os.path.join(run_directory, 'zdaemon.sock')
+            creating = [run_directory,
+                        os.path.join(options['bin-directory'], self.name),
+                        ]
+            if not os.path.exists(run_directory):
+                os.mkdir(run_directory)
 
-        zdaemon_conf = str(zdaemon_conf)
-
-        self.egg.install()
-        requirements, ws = self.egg.working_set()
-
-        if not os.path.exists(dest):
-            os.mkdir(dest)
-            created = True
-        else:
-            created = False
-            
         try:
+            app_loc = options['application-location']
+
+            zope_conf = options.get('zope.conf', '')+'\n'
+            zope_conf = ZConfigParse(cStringIO.StringIO(zope_conf))
+
+            zope_conf['site-definition'] = os.path.join(app_loc, 'site.zcml')
+
+            for address in options.get('address', '').split():
+                zope_conf.sections.append(
+                    ZConfigSection('server',
+                                   data=dict(type='HTTP',
+                                             address=address,
+                                             ),
+                                   )
+                    )
+            if not [s for s in zope_conf.sections
+                    if ('server' in s.type)]:
+                zope_conf.sections.append(
+                    ZConfigSection('server',
+                                   data=dict(type='HTTP',
+                                             address='8080',
+                                             ),
+                                   )
+                    )
+
+            if not [s for s in zope_conf.sections if s.type == 'zodb']:
+                raise zc.buildout.UserError(
+                    'No database sections have been defined.')
+
+            if not [s for s in zope_conf.sections if s.type == 'accesslog']:
+                zope_conf.sections.append(access_log(access_log_path))
+
+            if not [s for s in zope_conf.sections if s.type == 'eventlog']:
+                zope_conf.sections.append(event_log('STDOUT'))
+
+
+            zdaemon_conf = options.get('zdaemon.conf', '')+'\n'
+            zdaemon_conf = ZConfigParse(cStringIO.StringIO(zdaemon_conf))
+
+            defaults = {
+                'program': "%s -C %s" % (os.path.join(app_loc, 'runzope'),
+                                         zope_conf_path,
+                                         ),
+                'daemon': 'on',
+                'transcript': event_log_path,
+                'socket-name': socket_path,
+                'directory' : run_directory,
+                }
+            if deployment:
+                defaults['user'] = options['user']
+            runner = [s for s in zdaemon_conf.sections
+                      if s.type == 'runner']
+            if runner:
+                runner = runner[0]
+            else:
+                runner = ZConfigSection('runner')
+                zdaemon_conf.sections.insert(0, runner)
+            for name, value in defaults.items():
+                if name not in runner:
+                    runner[name] = value
+
+            if not [s for s in zdaemon_conf.sections
+                    if s.type == 'eventlog']:
+                # No database, specify a default one
+                zdaemon_conf.sections.append(event_log2(event_log_path))
+
+            zdaemon_conf = str(zdaemon_conf)
+
+            self.egg.install()
+            requirements, ws = self.egg.working_set()
+
             open(zope_conf_path, 'w').write(str(zope_conf))
             open(zdaemon_conf_path, 'w').write(str(zdaemon_conf))
 
@@ -249,12 +276,16 @@ class Instance:
                              ),
                 )
 
+            return creating
+
         except:
-            if created:
-                shutil.rmtree(dest)
+            for f in creating:
+                if os.path.is_dir(f):
+                    shutil.rmtree(f)
+                else:
+                    os.remove(f)
             raise
 
-        return dest, os.path.join(options['bin-directory'], self.name)
 
     def update(self):
         pass
