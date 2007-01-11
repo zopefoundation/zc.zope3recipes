@@ -102,8 +102,8 @@ checker = renormalizing.RENormalizing([
     "\(maybe misspelled\?\)"
     "\n"
     ), ''),
-    (re.compile("""['"][^\n]+zope3recipes[^\n]+['"],"""), #'
-                                          "'/zope3recipes',"),
+    (re.compile("""['"][^\n"']+zope3recipes[^\n"']*['"],"""),
+     "'/zope3recipes',"),
     (re.compile('#![^\n]+\n'), ''),                
     (re.compile('-\S+-py\d[.]\d(-\S+)?.egg'),
      '-pyN.N.egg',

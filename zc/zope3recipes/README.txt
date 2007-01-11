@@ -116,7 +116,9 @@ We get 3 files, two scripts and a site.zcml file.  The site.zcml file
 is just what we had in the buildout configuration:
 
     >>> cat('parts', 'myapp', 'site.zcml')
-    <configure xmlns='http://namespaces.zope.org/zope'>
+    <configure xmlns='http://namespaces.zope.org/zope'
+               xmlns:meta="http://namespaces.zope.org/meta"
+               >
     <include package="demo2" />
     <principal
     id="zope.manager"
@@ -187,7 +189,139 @@ variables available as global variables.
     <BLANKLINE>
     if __name__ == '__main__':
         zc.zope3recipes.debugzope.main()
-    
+
+Legacy Functional Testing Support
+---------------------------------
+
+Zope 3's functional testing support is based on zope.testing test
+layers. There is a default functional test layer that older functional
+tests use.  This layer loads the default configueration for the Zope
+application server.  It exists to provide support for older functional
+tests that were written before layers were added to the testing
+infrastructure.   The default testing layer has a number of
+disadvantages:
+
+- It loads configurations for a large number of packages.  This has
+  the potential to introduce testing dependency on all of these
+  packages. 
+
+- It required a ftesting.zcml file and makes assumptions about where
+  that file is.  In particular, it assumes a location relative to the
+  current working directory when the test is run.
+
+Newer software and maintained software should use their own functional
+testing layers that use test-configuration files defined in packages.
+
+To support older packages that use the default layer, a ftesting.zcml
+option is provided.  If it is used, then the contents of the option
+are written to a ftesting.zcml file in the application.  In addition,
+an ftesting-base.zcml file is written that includes configuration 
+traditionally found in a Zope 3 ftesting-base.zcml excluding reference
+to package-includes.
+
+If we modify our buildout to include an ftesting.zcml option:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = myapp
+    ... 
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... ftesting.zcml =
+    ...    <meta:provides feature="devmode" />
+    ...    <include file="ftesting-base.zcml" />
+    ...    <includeOverrides package="demo2" />
+    ... eggs = demo2
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    buildout: Develop: /sample-buildout/demo1
+    buildout: Develop: /sample-buildout/demo2
+    buildout: Uninstalling myapp
+    buildout: Installing myapp
+
+We'll get ftesting.zcml files and ftesting-base.zcml files created in
+the application:
+
+    >>> cat('parts', 'myapp', 'ftesting.zcml')
+    <configure xmlns='http://namespaces.zope.org/zope'
+               xmlns:meta="http://namespaces.zope.org/meta"
+               >
+    <BLANKLINE>
+    <meta:provides feature="devmode" />
+    <include file="ftesting-base.zcml" />
+    <includeOverrides package="demo2" />
+    </configure>
+
+    >>> cat('parts', 'myapp', 'ftesting-base.zcml')
+    <BLANKLINE>
+    <configure
+       xmlns="http://namespaces.zope.org/zope"
+       i18n_domain="zope"
+       >
+      <include package="zope.app" />
+      <include package="zope.app" file="ftesting.zcml" />
+      <include package="zope.app.securitypolicy" file="meta.zcml" />
+      <include package="zope.app.securitypolicy" />
+      <securityPolicy
+        component="zope.app.securitypolicy.zopepolicy.ZopeSecurityPolicy" />
+      <role id="zope.Anonymous" title="Everybody"
+                     description="All users have this role implicitly" />
+      <role id="zope.Manager" title="Site Manager" />
+      <role id="zope.Member" title="Site Member" />
+      <grant permission="zope.View"
+                      role="zope.Anonymous" />
+      <grant permission="zope.app.dublincore.view"
+                      role="zope.Anonymous" />
+      <grantAll role="zope.Manager" />
+      <include package="zope.app.securitypolicy.tests"
+               file="functional.zcml" />
+      <unauthenticatedPrincipal
+          id="zope.anybody"
+          title="Unauthenticated User"
+          />
+      <unauthenticatedGroup
+        id="zope.Anybody"
+        title="Unauthenticated Users"
+        />
+      <authenticatedGroup
+        id="zope.Authenticated"
+        title="Authenticated Users"
+        />
+      <everybodyGroup
+        id="zope.Everybody"
+        title="All Users"
+        />
+      <principal
+          id="zope.mgr"
+          title="Manager"
+          login="mgr"
+          password="mgrpw" />
+      <principal
+          id="zope.globalmgr"
+          title="Manager"
+          login="globalmgr"
+          password="globalmgrpw" />
+      <grant role="zope.Manager" principal="zope.globalmgr" />
+    </configure>
+
 Defining Zope3 instances
 ========================
 
@@ -259,8 +393,9 @@ Let's run the buildout, and see what we get:
     >>> print system(join('bin', 'buildout')),
     buildout: Develop: /sample-buildout/demo1
     buildout: Develop: /sample-buildout/demo2
+    buildout: Uninstalling myapp
     buildout: Installing database
-    buildout: Updating myapp
+    buildout: Installing myapp
     buildout: Installing instance
 
 We see thatthe database and myapp parts were included by virtue of

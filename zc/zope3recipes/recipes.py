@@ -34,12 +34,21 @@ class App:
             self.name,
             )
 
-        z3path = options['zope3-location'] = os.path.join(
+        options['zope3-location'] = os.path.join(
             buildout['buildout']['directory'],
             buildout[options.get('zope3', 'zope3')]['location'],
             )
 
+        options['scripts'] = ''
+        self.egg = zc.recipe.egg.Egg(buildout, name, options)
+
+
+    def install(self):
+        options = self.options
+
+        z3path = options['zope3-location']
         if not os.path.exists(z3path):
+            logger.error("The directory, %r, doesn't exist." % z3path)
             raise zc.buildout.UserError("No directory:", z3path)
 
         path = os.path.join(z3path, 'lib', 'python')
@@ -52,13 +61,6 @@ class App:
                 raise zc.buildout.UserError(
                     "Invalid Zope 3 installation:", z3path)
 
-        self.zpath = path
-        options['scripts'] = ''
-        self.egg = zc.recipe.egg.Egg(buildout, name, options)
-
-
-    def install(self):
-        options = self.options
         dest = options['location']
         if not os.path.exists(dest):
             os.mkdir(dest)
@@ -72,11 +74,10 @@ class App:
                 )
 
             extra = options.get('extra-paths')
-            zpath = self.zpath
             if extra:
-                extra += '\n' + zpath
+                extra += '\n' + path
             else:
-                extra = zpath
+                extra = path
             options['extra-paths'] = extra
 
             self.egg.install()
@@ -97,6 +98,13 @@ class App:
                 extra_paths = options['extra-paths'].split(),
                 )
 
+            ftesting_zcml = options.get('ftesting.zcml')
+            if ftesting_zcml:
+                open(os.path.join(dest, 'ftesting.zcml'), 'w'
+                     ).write(site_zcml_template % ftesting_zcml)
+                open(os.path.join(dest, 'ftesting-base.zcml'), 'w'
+                     ).write(ftesting_base)
+
             return dest
 
         except:
@@ -108,7 +116,10 @@ class App:
 
     update = install
 
-site_zcml_template = """<configure xmlns='http://namespaces.zope.org/zope'>
+site_zcml_template = """\
+<configure xmlns='http://namespaces.zope.org/zope'
+           xmlns:meta="http://namespaces.zope.org/meta"
+           >
 %s
 </configure>
 """
@@ -366,3 +377,55 @@ def ZConfigParse(file):
     c = ZConfigContext()
     ZConfig.cfgparser.ZConfigParser(ZConfigResource(file), c).parse(c.top)
     return c.top
+
+ftesting_base = """
+<configure
+   xmlns="http://namespaces.zope.org/zope"
+   i18n_domain="zope"
+   >
+  <include package="zope.app" />
+  <include package="zope.app" file="ftesting.zcml" />
+  <include package="zope.app.securitypolicy" file="meta.zcml" />
+  <include package="zope.app.securitypolicy" />
+  <securityPolicy
+    component="zope.app.securitypolicy.zopepolicy.ZopeSecurityPolicy" />
+  <role id="zope.Anonymous" title="Everybody"
+                 description="All users have this role implicitly" />
+  <role id="zope.Manager" title="Site Manager" />
+  <role id="zope.Member" title="Site Member" />
+  <grant permission="zope.View"
+                  role="zope.Anonymous" />
+  <grant permission="zope.app.dublincore.view"
+                  role="zope.Anonymous" />
+  <grantAll role="zope.Manager" />
+  <include package="zope.app.securitypolicy.tests"
+           file="functional.zcml" />
+  <unauthenticatedPrincipal
+      id="zope.anybody"
+      title="Unauthenticated User"
+      />
+  <unauthenticatedGroup
+    id="zope.Anybody"
+    title="Unauthenticated Users"
+    />
+  <authenticatedGroup
+    id="zope.Authenticated"
+    title="Authenticated Users"
+    />
+  <everybodyGroup
+    id="zope.Everybody"
+    title="All Users"
+    />
+  <principal
+      id="zope.mgr"
+      title="Manager"
+      login="mgr"
+      password="mgrpw" />
+  <principal
+      id="zope.globalmgr"
+      title="Manager"
+      login="globalmgr"
+      password="globalmgrpw" />
+  <grant role="zope.Manager" principal="zope.globalmgr" />
+</configure>
+"""
