@@ -959,9 +959,12 @@ since we'll typically have additional instances in the deployment.
 The control script is in the init.d directory:
 
     >>> ls(root, 'etc', 'init.d')
-    -  instance
+    -  myapp-run-instance
 
-and the configuration files will be changed to reflect the deployment
+Note that the deployment name is added as a prefix of the control
+script name.
+
+The configuration files have changed to reflect the deployment
 locations:
 
     >>> cat(root, 'etc', 'myapp-run', 'instance-zope.conf')

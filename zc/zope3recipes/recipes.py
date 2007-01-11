@@ -169,8 +169,9 @@ class Instance:
                                            self.name+'-access.log')
             socket_path = os.path.join(run_directory,
                                        self.name+'-zdaemon.sock')
+            rc = deployment + '-' + self.name
             creating = [zope_conf_path, zdaemon_conf_path,
-                        os.path.join(options['bin-directory'], self.name),
+                        os.path.join(options['bin-directory'], rc),
                         ]
         else:
             zope_conf_path = os.path.join(run_directory, 'zope.conf')
@@ -178,8 +179,9 @@ class Instance:
             event_log_path = os.path.join(run_directory, 'z3.log')
             access_log_path = os.path.join(run_directory, 'access.log')
             socket_path = os.path.join(run_directory, 'zdaemon.sock')
+            rc = self.name
             creating = [run_directory,
-                        os.path.join(options['bin-directory'], self.name),
+                        os.path.join(options['bin-directory'], rc),
                         ]
             if not os.path.exists(run_directory):
                 os.mkdir(run_directory)
@@ -260,7 +262,7 @@ class Instance:
             open(zdaemon_conf_path, 'w').write(str(zdaemon_conf))
 
             zc.buildout.easy_install.scripts(
-                [(self.name, 'zc.zope3recipes.ctl', 'main')],
+                [(rc, 'zc.zope3recipes.ctl', 'main')],
                 ws, options['executable'], options['bin-directory'],
                 extra_paths = [this_loc],
                 arguments = ('['
