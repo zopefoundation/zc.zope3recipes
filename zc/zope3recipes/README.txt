@@ -102,7 +102,7 @@ Let's run the buildout and see what we get:
     buildout: Develop: /sample-buildout/demo2
     buildout: Installing myapp
 
-A directory is created in the parts directory for out application files:
+A directory is created in the parts directory for our application files:
 
     >>> ls('parts')
     d  myapp
