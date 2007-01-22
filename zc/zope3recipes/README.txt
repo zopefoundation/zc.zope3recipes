@@ -188,7 +188,7 @@ variables available as global variables.
     import zc.zope3recipes.debugzope
     <BLANKLINE>
     if __name__ == '__main__':
-        zc.zope3recipes.debugzope.main()
+        zc.zope3recipes.debugzope.debug()
 
 Legacy Functional Testing Support
 ---------------------------------

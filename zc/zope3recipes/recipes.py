@@ -93,7 +93,7 @@ class App:
             options['extra-paths'] = extra + '\n' + this_loc
 
             zc.buildout.easy_install.scripts(
-                [('debugzope', 'zc.zope3recipes.debugzope', 'main')],
+                [('debugzope', 'zc.zope3recipes.debugzope', 'debug')],
                 ws, options['executable'], dest,
                 extra_paths = options['extra-paths'].split(),
                 )
