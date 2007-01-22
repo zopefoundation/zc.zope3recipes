@@ -16,32 +16,58 @@
 $Id$
 """
 
-import os, sys
+import os, sys, traceback
 import zope.app.debug
 import zope.app.twisted.main
 import zope.app.appsetup.interfaces
 from zope.event import notify
 
-def zglobals(args):
-    options = zope.app.twisted.main.load_options(args)
+
+def load_options(args):
+    options = zope.app.twisted.main.ZopeOptions()
+    options.schemadir = os.path.dirname(os.path.abspath(
+        zope.app.twisted.main.__file__))
+    options.positional_args_allowed = True
+    options.realize(args)
+
+    if options.configroot.path:
+        sys.path[:0] = [os.path.abspath(p) for p in options.configroot.path]
+    return options
+
+
+def zglobals(options):
     zope.app.appsetup.config(options.site_definition)
     db = zope.app.appsetup.appsetup.multi_database(options.databases)[0][0]
     notify(zope.app.appsetup.interfaces.DatabaseOpened(db))
     
-    db = zope.app.twisted.main.debug(args)
     if "PYTHONSTARTUP" in os.environ:
         execfile(os.environ["PYTHONSTARTUP"])
     
     app = zope.app.debug.Debugger.fromDatabase(db)
-    return options, dict(
+    return dict(
         app = app,
         debugger = app,
         root = app.root(),
         __name__ = '__main__',
         )
 
-def debug(args):
-    options, globs = zglobals(args[:2])
+def debug(args=None):
+    if args is None:
+        args = sys.argv[1:]
+
+    options = load_options(args)
+    try:
+        globs = zglobals(options.configroot)
+    except:
+        if options.args:
+            raise
+        else:
+            traceback.print_exc()
+            import pdb
+            pdb.post_mortem(sys.exc_info()[2])
+            return
+            
+            
     args = options.args
 
     if args:
