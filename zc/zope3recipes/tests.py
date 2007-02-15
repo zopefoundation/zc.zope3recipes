@@ -85,6 +85,30 @@ debug is another name for run:
 
 """
 
+def test_sane_errors_from_recipe():
+    """
+There was a bug in the recipe error handling that caused errors to be hidden
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... parts = instance
+    ...
+    ... [myapp]
+    ... location = foo
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... application = myapp
+    ... zope.conf = 
+    ... ''')
+
+    >>> print system(join('bin', 'buildout')),
+    Couldn't find index page for 'zc.recipe.egg' (maybe misspelled?)
+    buildout: Installing instance
+    Error: No database sections have been defined.
+    """
+
 def setUp(test):
     zc.buildout.testing.buildoutSetUp(test)
     zc.buildout.testing.install_develop('zc.zope3recipes', test)

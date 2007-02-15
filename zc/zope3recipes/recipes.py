@@ -129,6 +129,12 @@ class Instance:
     def __init__(self, buildout, name, options):
         self.name, self.options = name, options
 
+        for section in options.get('extends', '').split():
+            options.update(
+                [(k, v) for (k, v) in buildout[section].items()
+                 if k not in options
+                 ])
+
         options['application-location'] = buildout[options['application']
                                                    ]['location']
 
@@ -150,12 +156,8 @@ class Instance:
                 self.name,
                 )
             
-            
-
     def install(self):
         options = self.options
-
-
         run_directory = options['run-directory']
         deployment = self.deployment
         if deployment:
@@ -282,9 +284,9 @@ class Instance:
 
         except:
             for f in creating:
-                if os.path.is_dir(f):
+                if os.path.isdir(f):
                     shutil.rmtree(f)
-                else:
+                elif os.path.exists(f):
                     os.remove(f)
             raise
 

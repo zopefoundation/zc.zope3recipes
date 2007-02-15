@@ -1013,3 +1013,108 @@ locations:
       </logfile>
     <BLANKLINE>
     </eventlog>
+
+Defining multiple similar instances
+-----------------------------------
+
+Often you want to define multiple instances that differ only by one or
+two options (e.g. an address).  The extends option lets you name a
+section from which default options should be loaded.  Any options in
+the source section not defined in the extending section are added to
+the extending section.
+
+Let's update our buildout to add a new instance:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance instance2
+    ... 
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... application = myapp
+    ... zope.conf = ${database:zconfig}
+    ... address = 8081
+    ... deployment = myapp-run
+    ...
+    ... [instance2]
+    ... recipe = zc.zope3recipes:instance
+    ... extends = instance
+    ... address = 8082
+    ...
+    ... [database]
+    ... recipe = zc.recipe.filestorage
+    ...
+    ... [myapp-run]
+    ... etc-directory = %(root)s/etc/myapp-run
+    ... rc-directory = %(root)s/etc/init.d
+    ... log-directory = %(root)s/var/log/myapp-run
+    ... run-directory = %(root)s/var/run/myapp-run
+    ... user = zope
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    buildout: Develop: /sample-buildout/demo1
+    buildout: Develop: /sample-buildout/demo2
+    buildout: Updating database
+    buildout: Updating myapp
+    buildout: Updating instance
+    buildout: Installing instance2
+
+Now, we have the new instance configuration files:
+
+    >>> ls(root, 'etc', 'myapp-run')
+    -  instance-zdaemon.conf
+    -  instance-zope.conf
+    -  instance2-zdaemon.conf
+    -  instance2-zope.conf
+
+    >>> cat(root, 'etc', 'myapp-run', 'instance2-zope.conf')
+    site-definition /sample-buildout/parts/myapp/site.zcml
+    <BLANKLINE>
+    <zodb>
+      <filestorage>
+        path /sample-buildout/parts/database/Data.fs
+      </filestorage>
+    <BLANKLINE>
+    </zodb>
+    <BLANKLINE>
+    <server>
+      address 8082
+      type HTTP
+    </server>
+    <BLANKLINE>
+    <accesslog>
+      <logfile>
+        path /root/var/log/myapp-run/instance2-access.log
+      </logfile>
+    <BLANKLINE>
+    </accesslog>
+    <BLANKLINE>
+    <eventlog>
+      <logfile>
+        formatter zope.exceptions.log.Formatter
+        path STDOUT
+      </logfile>
+    <BLANKLINE>
+    </eventlog>

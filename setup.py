@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 name = "zc.zope3recipes"
 setup(
     name = name,
-    version = "0.1a1",
+    version = "0.2",
     author = "Jim Fulton",
     author_email = "jim@zope.com",
     description = "ZC Buildout recipe for defining Zope 3 applications",
