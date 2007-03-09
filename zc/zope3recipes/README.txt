@@ -190,6 +190,124 @@ variables available as global variables.
     if __name__ == '__main__':
         zc.zope3recipes.debugzope.debug()
 
+Note that the runzope shown above uses the default, twisted-based
+server components.  It's possible to specify which set of server
+components is used: the "servers" setting can be set to either
+"zserver" or "twisted".  For the application, this affects the runzope
+script; we'll see additional differences when we create instances of
+the application.
+
+Let's continue to use the twisted servers, but make the selection
+explicit:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = myapp
+    ... 
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... servers = twisted
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    buildout: Develop: /sample-buildout/demo1
+    buildout: Develop: /sample-buildout/demo2
+    buildout: Updating myapp
+
+Note that this is recognized as not being a change to the
+configuration; the messages say that myapp was updated, not
+uninstalled and then re-installed.
+
+The runzope script generated is identical to what we saw before:
+
+    >>> cat('parts', 'myapp', 'runzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      '/sample-buildout/demo2',
+      '/sample-buildout/demo1',
+      '/zope3/src',
+      ]
+    <BLANKLINE>
+    import zope.app.twisted.main
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zope.app.twisted.main.main()
+
+We can also specify the ZServer servers explicitly:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = myapp
+    ... 
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... servers = zserver
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    buildout: Develop: /sample-buildout/demo1
+    buildout: Develop: /sample-buildout/demo2
+    buildout: Uninstalling myapp
+    buildout: Installing myapp
+
+The part has been re-installed, and the runzope script generated is
+different now.  Note that the main() function is imported from a
+different package this time:
+
+    >>> cat('parts', 'myapp', 'runzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      '/sample-buildout/demo2',
+      '/sample-buildout/demo1',
+      '/zope3/src',
+      ]
+    <BLANKLINE>
+    import zope.app.server.main
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zope.app.server.main.main()
+
+
 Legacy Functional Testing Support
 ---------------------------------
 
@@ -415,6 +533,166 @@ The instance directory contains zdaemon.conf and zope.conf files:
     -  zope.conf
 
 Let's look at the zope.conf file that was generated:
+
+    >>> cat('parts', 'instance', 'zope.conf')
+    site-definition /sample-buildout/parts/myapp/site.zcml
+    <BLANKLINE>
+    <zodb>
+      <filestorage>
+        path /sample-buildout/parts/database/Data.fs
+      </filestorage>
+    <BLANKLINE>
+    </zodb>
+    <BLANKLINE>
+    <server>
+      address 8080
+      type HTTP
+    </server>
+    <BLANKLINE>
+    <accesslog>
+      <logfile>
+        path /sample-buildout/parts/instance/access.log
+      </logfile>
+    <BLANKLINE>
+    </accesslog>
+    <BLANKLINE>
+    <eventlog>
+      <logfile>
+        formatter zope.exceptions.log.Formatter
+        path STDOUT
+      </logfile>
+    <BLANKLINE>
+    </eventlog>
+
+This uses the twisted server types, since that's the default
+configuration for Zope 3.  If we specify use of the ZServer servers,
+the names of the server types are adjusted appropriately:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance
+    ... 
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... servers = zserver
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... application = myapp
+    ... zope.conf = ${database:zconfig}
+    ...
+    ... [database]
+    ... recipe = zc.recipe.filestorage
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    buildout: Develop: /sample-buildout/demo1
+    buildout: Develop: /sample-buildout/demo2
+    buildout: Uninstalling instance
+    buildout: Uninstalling myapp
+    buildout: Updating database
+    buildout: Installing myapp
+    buildout: Installing instance
+
+The generated zope.conf file now uses the ZServer server components
+instead:
+
+    >>> cat('parts', 'instance', 'zope.conf')
+    site-definition /sample-buildout/parts/myapp/site.zcml
+    <BLANKLINE>
+    <zodb>
+      <filestorage>
+        path /sample-buildout/parts/database/Data.fs
+      </filestorage>
+    <BLANKLINE>
+    </zodb>
+    <BLANKLINE>
+    <server>
+      address 8080
+      type WSGI-HTTP
+    </server>
+    <BLANKLINE>
+    <accesslog>
+      <logfile>
+        path /sample-buildout/parts/instance/access.log
+      </logfile>
+    <BLANKLINE>
+    </accesslog>
+    <BLANKLINE>
+    <eventlog>
+      <logfile>
+        formatter zope.exceptions.log.Formatter
+        path STDOUT
+      </logfile>
+    <BLANKLINE>
+    </eventlog>
+
+The Twisted-based servers can also be specified explicitly:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance
+    ... 
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... servers = twisted
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... application = myapp
+    ... zope.conf = ${database:zconfig}
+    ...
+    ... [database]
+    ... recipe = zc.recipe.filestorage
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    buildout: Develop: /sample-buildout/demo1
+    buildout: Develop: /sample-buildout/demo2
+    buildout: Uninstalling instance
+    buildout: Uninstalling myapp
+    buildout: Updating database
+    buildout: Installing myapp
+    buildout: Installing instance
+
+The generated zope.conf file now uses the Twisted server components
+once more:
 
     >>> cat('parts', 'instance', 'zope.conf')
     site-definition /sample-buildout/parts/myapp/site.zcml

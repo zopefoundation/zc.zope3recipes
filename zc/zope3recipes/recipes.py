@@ -24,6 +24,13 @@ import cStringIO
 this_loc = pkg_resources.working_set.find(
     pkg_resources.Requirement.parse('zc.zope3recipes')).location
 
+server_types = {
+    # name     (module,                  http-name)
+    'twisted': ('zope.app.twisted.main', 'HTTP'),
+    'zserver': ('zope.app.server.main',  'WSGI-HTTP'),
+    }
+
+
 class App:
 
     def __init__(self, buildout, name, options):
@@ -39,9 +46,13 @@ class App:
             buildout[options.get('zope3', 'zope3')]['location'],
             )
 
+        options['servers'] = options.get('servers', 'twisted')
+        if options['servers'] not in server_types:
+            raise ValueError(
+                'servers setting must be one of "twisted" or "zserver"')
+
         options['scripts'] = ''
         self.egg = zc.recipe.egg.Egg(buildout, name, options)
-
 
     def install(self):
         options = self.options
@@ -84,8 +95,9 @@ class App:
             requirements, ws = self.egg.working_set()
 
             # install subprograms and ctl scripts
+            server_module = server_types[options['servers']][0]
             zc.buildout.easy_install.scripts(
-                [('runzope', 'zope.app.twisted.main', 'main')],
+                [('runzope', server_module, 'main')],
                 ws, options['executable'], dest,
                 extra_paths = options['extra-paths'].split(),
                 )
@@ -139,6 +151,7 @@ class Instance:
                                                    ]['location']
 
         options['scripts'] = ''
+        options['servers'] = buildout[options['application']]['servers']
         options['eggs'] = options.get('eggs', 'zdaemon\nsetuptools')
         self.egg = zc.recipe.egg.Egg(buildout, name, options)
 
@@ -196,10 +209,11 @@ class Instance:
 
             zope_conf['site-definition'] = os.path.join(app_loc, 'site.zcml')
 
+            server_type = server_types[options['servers']][1]
             for address in options.get('address', '').split():
                 zope_conf.sections.append(
                     ZConfigSection('server',
-                                   data=dict(type='HTTP',
+                                   data=dict(type=server_type,
                                              address=address,
                                              ),
                                    )
@@ -208,7 +222,7 @@ class Instance:
                     if ('server' in s.type)]:
                 zope_conf.sections.append(
                     ZConfigSection('server',
-                                   data=dict(type='HTTP',
+                                   data=dict(type=server_type,
                                              address='8080',
                                              ),
                                    )

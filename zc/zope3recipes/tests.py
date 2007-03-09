@@ -96,6 +96,9 @@ There was a bug in the recipe error handling that caused errors to be hidden
     ...
     ... [myapp]
     ... location = foo
+    ... ;; Note that 'servers' has a default value when the
+    ... ;; application recipe is involved.
+    ... servers = twisted
     ...
     ... [instance]
     ... recipe = zc.zope3recipes:instance
