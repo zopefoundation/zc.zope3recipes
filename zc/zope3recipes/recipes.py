@@ -41,10 +41,12 @@ class App:
             self.name,
             )
 
-        options['zope3-location'] = os.path.join(
-            buildout['buildout']['directory'],
-            buildout[options.get('zope3', 'zope3')]['location'],
-            )
+        location = buildout[options.get('zope3', 'zope3')]['location']
+        if location:
+            options['zope3-location'] = os.path.join(
+                buildout['buildout']['directory'],
+                location,
+                )
 
         options['servers'] = options.get('servers', 'twisted')
         if options['servers'] not in server_types:
@@ -57,20 +59,24 @@ class App:
     def install(self):
         options = self.options
 
-        z3path = options['zope3-location']
-        if not os.path.exists(z3path):
-            logger.error("The directory, %r, doesn't exist." % z3path)
-            raise zc.buildout.UserError("No directory:", z3path)
+        try:
+            z3path = options['zope3-location']
+        except:
+            path = ''
+        else:
+            if not os.path.exists(z3path):
+                logger.error("The directory, %r, doesn't exist." % z3path)
+                raise zc.buildout.UserError("No directory:", z3path)
 
-        path = os.path.join(z3path, 'lib', 'python')
-        if not os.path.exists(path):
-            path = os.path.join(z3path, 'src')
+            path = os.path.join(z3path, 'lib', 'python')
             if not os.path.exists(path):
-                logger.error(
-                    "The directory, %r, isn't a valid checkout or release."
-                    % z3)
-                raise zc.buildout.UserError(
-                    "Invalid Zope 3 installation:", z3path)
+                path = os.path.join(z3path, 'src')
+                if not os.path.exists(path):
+                    logger.error(
+                        "The directory, %r, isn't a valid checkout or release."
+                        % z3)
+                    raise zc.buildout.UserError(
+                        "Invalid Zope 3 installation:", z3path)
 
         dest = options['location']
         if not os.path.exists(dest):

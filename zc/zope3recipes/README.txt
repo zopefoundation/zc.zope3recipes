@@ -12,14 +12,13 @@ Building Zope 3 Applications
 ============================
 
 The "app" recipe is used to define a Zope application.  It is designed
-to work with classic Zope releases. (In the future, there will be an
-"application" recipe that will work with Zope soley as eggs.)  The app
-recipe causes a part to be created. The part will contain the scripts
-runzope and debugzope and the application's site.zcml.  Both of the
-scripts will require providing a -C option and the path to a zope.conf
-file when run.  The debugzope script can be run with a script name and
-arguments, in which case it will run the script, rather than starting
-an interactive session.
+to work with classic Zope releases and with Zope solely as eggs.
+The app recipe causes a part to be created. The part will contain the 
+scripts runzope and debugzope and the application's site.zcml.
+Both of the scripts will require providing a -C option and the path to a
+zope.conf file when run.  The debugzope script can be run with a script
+name and arguments, in which case it will run the script, rather than 
+starting an interactive session.
 
 The app recipe accepts the following options:
 
@@ -29,7 +28,8 @@ zope3
   distribution.  If the location has a lib/python subdirectory, it is
   treated as a distribution, othwerwise, it must have a src
   subdirectory and will be treated as a checkout. This option defaults
-  to "zope3".
+  to "zope3".  And if location is empty, the application will run solely
+  from eggs.
 
 site.zcml
   The contents of site.zcml.
@@ -306,6 +306,148 @@ different package this time:
     <BLANKLINE>
     if __name__ == '__main__':
         zope.app.server.main.main()
+
+
+Run Application Solely from Eggs
+-------------------------------
+
+To run a Zope 3 application solely from eggs, value of location in 
+zope3 section should set to empty.  Now we'll create a buildout.cfg
+file that defines our application with an empty location:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = myapp
+    ... 
+    ... [zope3]
+    ... location =
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ... ''' % globals())
+
+This is same as the example we have see above with a change in zope3 section.
+Note that our site.zcml file is very small.  It expect the application
+zcml to define amost everything.  In fact, a site.zcml file will often
+include just a single include directive.  We don't need to include the
+surrounding configure element, unless we want a namespace other than
+the zope namespace.  A configure directive will be included for us.
+
+Let's run the buildout and see what we get:
+
+    >>> print system(join('bin', 'buildout')),
+    buildout: Develop: /sample-buildout/demo1
+    buildout: Develop: /sample-buildout/demo2
+    buildout: Uninstalling myapp
+    buildout: Installing myapp
+
+A directory is created in the parts directory for our application files:
+
+    >>> ls('parts')
+    d  myapp
+
+    >>> ls('parts', 'myapp')
+    -  debugzope
+    -  runzope
+    -  site.zcml
+
+We get 3 files, two scripts and a site.zcml file.  The site.zcml file
+is just what we had in the buildout configuration:
+
+    >>> cat('parts', 'myapp', 'site.zcml')
+    <configure xmlns='http://namespaces.zope.org/zope'
+               xmlns:meta="http://namespaces.zope.org/meta"
+               >
+    <include package="demo2" />
+    <principal
+    id="zope.manager"
+    title="Manager"
+    login="jim"
+    password_manager="SHA1"
+    password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    />
+    <grant
+    role="zope.Manager"
+    principal="zope.manager"
+    />
+    </configure>
+
+Unfortunately, the leading whitespace is stripped from the
+configuration file lines.  This is a consequence of the way
+ConfigParser works.
+
+The runzope script runs the Web server:
+
+    >>> cat('parts', 'myapp', 'runzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      '/sample-buildout/demo2',
+      '/sample-buildout/demo1',
+      ]
+    <BLANKLINE>
+    import zope.app.twisted.main
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zope.app.twisted.main.main()
+
+It includes in it's path the eggs we specified in the configuration
+file, along with their dependencies. Note that we haven't specified a
+configuration file.  When runzope is run, a -C option must be used to
+provide a configuration file.  -X options can also be provided to 
+override configuration file options.
+
+The debugzope script provides access to the object system.  When
+debugzope is run, a -C option must be used to provide a configuration
+file.  -X options can also be provided to override configuration file
+options.  If run without any additional arguments, then an interactive
+interpreter will be started with databases specified in the
+configuration file opened and with the variable root set to the
+application root object.  The debugger variable is set to a Zope 3
+debugger.  If additional arguments are provided, then the first
+argument should be a script name and the remaining arguments are
+script arguments.  The script will be run with the root and debugger
+variables available as global variables.
+
+..
+
+    >>> cat('parts', 'myapp', 'debugzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      '/sample-buildout/demo2',
+      '/sample-buildout/demo1',
+      '/zope3recipes',
+      ]
+    <BLANKLINE>
+    import zc.zope3recipes.debugzope
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zc.zope3recipes.debugzope.debug()
+
+Note that the runzope shown above uses the default, twisted-based
+server components.  It's possible to specify which set of server
+components is used: the "servers" setting can be set to either
+"zserver" or "twisted".  For the application, this affects the runzope
+script; we'll see additional differences when we create instances of
+the application.
 
 
 Legacy Functional Testing Support

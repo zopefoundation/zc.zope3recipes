@@ -109,6 +109,8 @@ There was a bug in the recipe error handling that caused errors to be hidden
     >>> print system(join('bin', 'buildout')),
     Couldn't find index page for 'zc.recipe.egg' (maybe misspelled?)
     buildout: Installing instance
+    While:
+      Installing instance
     Error: No database sections have been defined.
     """
 
