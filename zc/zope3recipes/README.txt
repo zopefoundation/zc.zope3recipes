@@ -26,7 +26,7 @@ zope3
   The name of a section defining a location option that gives the
   location of a Zope installation.  This can be either a checkout or a
   distribution.  If the location has a lib/python subdirectory, it is
-  treated as a distribution, othwerwise, it must have a src
+  treated as a distribution, otherwise, it must have a src
   subdirectory and will be treated as a checkout. This option defaults
   to "zope3".  And if location is empty, the application will run solely
   from eggs.
@@ -90,7 +90,7 @@ Now we'll create a buildout.cfg file that defines our application:
     ... ''' % globals())
 
 Note that our site.zcml file is very small.  It expect the application
-zcml to define amost everything.  In fact, a site.zcml file will often
+zcml to define almost everything.  In fact, a site.zcml file will often
 include just a single include directive.  We don't need to include the
 surrounding configure element, unless we want a namespace other than
 the zope namespace.  A configure directive will be included for us.
@@ -343,7 +343,7 @@ file that defines our application with an empty location:
 
 This is same as the example we have see above with a change in zope3 section.
 Note that our site.zcml file is very small.  It expect the application
-zcml to define amost everything.  In fact, a site.zcml file will often
+zcml to define almost everything.  In fact, a site.zcml file will often
 include just a single include directive.  We don't need to include the
 surrounding configure element, unless we want a namespace other than
 the zope namespace.  A configure directive will be included for us.
@@ -455,7 +455,7 @@ Legacy Functional Testing Support
 
 Zope 3's functional testing support is based on zope.testing test
 layers. There is a default functional test layer that older functional
-tests use.  This layer loads the default configueration for the Zope
+tests use.  This layer loads the default configuration for the Zope
 application server.  It exists to provide support for older functional
 tests that were written before layers were added to the testing
 infrastructure.   The default testing layer has a number of
@@ -658,7 +658,7 @@ Let's run the buildout, and see what we get:
     buildout: Installing myapp
     buildout: Installing instance
 
-We see thatthe database and myapp parts were included by virtue of
+We see that the database and myapp parts were included by virtue of
 being referenced from the instance part.
 
 We get new directories for our database and instance:
@@ -1144,7 +1144,7 @@ refers to the runzope script in our application directory.  The socket
 file, used for communication between the zdaemon command-line script
 and the zademon manager is placed in the instance directory.
 
-If you want to overrise any part of the generated zdaemon output,
+If you want to override any part of the generated zdaemon output,
 simply provide a zdaemon.conf option in your instance section:
 
 
@@ -1248,10 +1248,10 @@ The log file settings deserver some explanation.  The Zope event log
 only captures output from logging calls.  In particular, it doesn't
 capture startup errors written to standard error.  The zdaemon
 transcript log is very useful for capturing this output.  Without it,
-error written to standard error are lost when running as a deamon.
+error written to standard error are lost when running as a daemon.
 The default Zope 3 configuration in the past was to write the Zope
 access and event log output to both files and standard output and to
-define a transcript log.  This had the effect that the transacript
+define a transcript log.  This had the effect that the transcript
 duplicated the contents of the event log and access logs, in addition
 to capturing other output.  This was space inefficient.
 
@@ -1259,7 +1259,7 @@ This recipe's approach is to combine the zope and zdaemon event-log
 information as well as Zope error output into a single log file.  We
 do this by directing Zope's event log to standard output, where it is
 useful when running Zope in foreground mode and where it can be
-captured by the zdaemon transscript log.
+captured by the zdaemon transcript log.
 
 Unix Deployments
 ----------------
@@ -1269,7 +1269,7 @@ by the zc.recipe.deployment recipe.  A deployment part defines a number of
 options used by the instance recipe:
 
 etc-directory
-    The name of the directory where configurtion files should be
+    The name of the directory where configuration files should be
     placed.  This defaults to /etc/NAME, where NAME is the deployment
     name. 
 
@@ -1356,7 +1356,7 @@ use the deployment.  If we rerun the buildout:
     buildout: Updating myapp
     buildout: Installing instance
 
-The installe files will move.  We'll no-longer have the instance part:
+The installer files will move.  We'll no-longer have the instance part:
 
     >>> ls('parts')
     d  database
