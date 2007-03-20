@@ -13,11 +13,11 @@ Building Zope 3 Applications
 
 The "app" recipe is used to define a Zope application.  It is designed
 to work with classic Zope releases and with Zope solely as eggs.
-The app recipe causes a part to be created. The part will contain the 
+The app recipe causes a part to be created. The part will contain the
 scripts runzope and debugzope and the application's site.zcml.
 Both of the scripts will require providing a -C option and the path to a
 zope.conf file when run.  The debugzope script can be run with a script
-name and arguments, in which case it will run the script, rather than 
+name and arguments, in which case it will run the script, rather than
 starting an interactive session.
 
 The app recipe accepts the following options:
@@ -36,7 +36,7 @@ site.zcml
 
 eggs
   The names of one or more eggs, with their dependencies that should
-  be included in the Python path of the generated scripts. 
+  be included in the Python path of the generated scripts.
 
 Let's look at an example.  We'll make a faux zope installation:
 
@@ -47,14 +47,14 @@ We'll also define some (bogus) eggs that we can use in our
 application:
 
     >>> mkdir('demo1')
-    >>> write('demo1', 'setup.py', 
+    >>> write('demo1', 'setup.py',
     ... '''
     ... from setuptools import setup
     ... setup(name = 'demo1')
     ... ''')
 
     >>> mkdir('demo2')
-    >>> write('demo2', 'setup.py', 
+    >>> write('demo2', 'setup.py',
     ... '''
     ... from setuptools import setup
     ... setup(name = 'demo2', install_requires='demo1')
@@ -68,7 +68,7 @@ Now we'll create a buildout.cfg file that defines our application:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = myapp
-    ... 
+    ...
     ... [zope3]
     ... location = %(zope3)s
     ...
@@ -157,7 +157,7 @@ The runzope script runs the Web server:
 It includes in it's path the eggs we specified in the configuration
 file, along with their dependencies. Note that we haven't specified a
 configuration file.  When runzope is run, a -C option must be used to
-provide a configuration file.  -X options can also be provided to 
+provide a configuration file.  -X options can also be provided to
 override configuration file options.
 
 The debugzope script provides access to the object system.  When
@@ -205,7 +205,7 @@ explicit:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = myapp
-    ... 
+    ...
     ... [zope3]
     ... location = %(zope3)s
     ...
@@ -260,7 +260,7 @@ We can also specify the ZServer servers explicitly:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = myapp
-    ... 
+    ...
     ... [zope3]
     ... location = %(zope3)s
     ...
@@ -309,18 +309,18 @@ different package this time:
 
 
 Run Application Solely from Eggs
--------------------------------
+--------------------------------
 
-To run a Zope 3 application solely from eggs, value of location in 
-zope3 section should set to empty.  Now we'll create a buildout.cfg
-file that defines our application with an empty location:
+To run a Zope 3 application solely from eggs, value of location in
+zope3 section should be set to empty.  Now we'll create a buildout.cfg
+file that defines our application with an empty location for zope3:
 
     >>> write('buildout.cfg',
     ... '''
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = myapp
-    ... 
+    ...
     ... [zope3]
     ... location =
     ...
@@ -341,55 +341,13 @@ file that defines our application with an empty location:
     ... eggs = demo2
     ... ''' % globals())
 
-This is same as the example we have see above with a change in zope3 section.
-Note that our site.zcml file is very small.  It expect the application
-zcml to define almost everything.  In fact, a site.zcml file will often
-include just a single include directive.  We don't need to include the
-surrounding configure element, unless we want a namespace other than
-the zope namespace.  A configure directive will be included for us.
-
-Let's run the buildout and see what we get:
+Now, Let's run the buildout and see what we get:
 
     >>> print system(join('bin', 'buildout')),
     buildout: Develop: /sample-buildout/demo1
     buildout: Develop: /sample-buildout/demo2
     buildout: Uninstalling myapp
     buildout: Installing myapp
-
-A directory is created in the parts directory for our application files:
-
-    >>> ls('parts')
-    d  myapp
-
-    >>> ls('parts', 'myapp')
-    -  debugzope
-    -  runzope
-    -  site.zcml
-
-We get 3 files, two scripts and a site.zcml file.  The site.zcml file
-is just what we had in the buildout configuration:
-
-    >>> cat('parts', 'myapp', 'site.zcml')
-    <configure xmlns='http://namespaces.zope.org/zope'
-               xmlns:meta="http://namespaces.zope.org/meta"
-               >
-    <include package="demo2" />
-    <principal
-    id="zope.manager"
-    title="Manager"
-    login="jim"
-    password_manager="SHA1"
-    password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
-    />
-    <grant
-    role="zope.Manager"
-    principal="zope.manager"
-    />
-    </configure>
-
-Unfortunately, the leading whitespace is stripped from the
-configuration file lines.  This is a consequence of the way
-ConfigParser works.
 
 The runzope script runs the Web server:
 
@@ -407,25 +365,8 @@ The runzope script runs the Web server:
     if __name__ == '__main__':
         zope.app.twisted.main.main()
 
-It includes in it's path the eggs we specified in the configuration
-file, along with their dependencies. Note that we haven't specified a
-configuration file.  When runzope is run, a -C option must be used to
-provide a configuration file.  -X options can also be provided to 
-override configuration file options.
-
-The debugzope script provides access to the object system.  When
-debugzope is run, a -C option must be used to provide a configuration
-file.  -X options can also be provided to override configuration file
-options.  If run without any additional arguments, then an interactive
-interpreter will be started with databases specified in the
-configuration file opened and with the variable root set to the
-application root object.  The debugger variable is set to a Zope 3
-debugger.  If additional arguments are provided, then the first
-argument should be a script name and the remaining arguments are
-script arguments.  The script will be run with the root and debugger
-variables available as global variables.
-
-..
+Here, unlike the above example the location path is not included
+in sys.path .  Similarly debugzope script is also changed:
 
     >>> cat('parts', 'myapp', 'debugzope')
     #!/usr/local/bin/python2.4
@@ -442,13 +383,6 @@ variables available as global variables.
     if __name__ == '__main__':
         zc.zope3recipes.debugzope.debug()
 
-Note that the runzope shown above uses the default, twisted-based
-server components.  It's possible to specify which set of server
-components is used: the "servers" setting can be set to either
-"zserver" or "twisted".  For the application, this affects the runzope
-script; we'll see additional differences when we create instances of
-the application.
-
 
 Legacy Functional Testing Support
 ---------------------------------
@@ -463,7 +397,7 @@ disadvantages:
 
 - It loads configurations for a large number of packages.  This has
   the potential to introduce testing dependency on all of these
-  packages. 
+  packages.
 
 - It required a ftesting.zcml file and makes assumptions about where
   that file is.  In particular, it assumes a location relative to the
@@ -475,7 +409,7 @@ testing layers that use test-configuration files defined in packages.
 To support older packages that use the default layer, a ftesting.zcml
 option is provided.  If it is used, then the contents of the option
 are written to a ftesting.zcml file in the application.  In addition,
-an ftesting-base.zcml file is written that includes configuration 
+an ftesting-base.zcml file is written that includes configuration
 traditionally found in a Zope 3 ftesting-base.zcml excluding reference
 to package-includes.
 
@@ -486,7 +420,7 @@ If we modify our buildout to include an ftesting.zcml option:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = myapp
-    ... 
+    ...
     ... [zope3]
     ... location = %(zope3)s
     ...
@@ -603,7 +537,7 @@ example:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
-    ... 
+    ...
     ... [zope3]
     ... location = %(zope3)s
     ...
@@ -715,7 +649,7 @@ the names of the server types are adjusted appropriately:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
-    ... 
+    ...
     ... [zope3]
     ... location = %(zope3)s
     ...
@@ -794,7 +728,7 @@ The Twisted-based servers can also be specified explicitly:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
-    ... 
+    ...
     ... [zope3]
     ... location = %(zope3)s
     ...
@@ -871,7 +805,7 @@ option.  It has a site-definition option that names the site.zcml file
 from our application directory.
 
 We didn't specify any server or logging ZConfig sections, so some were
-generated for us.  
+generated for us.
 
 Note that, by default, the event-log output goes to standard output.
 We'll say more about that when we talk about the zdaemon
@@ -884,7 +818,7 @@ If we specify a server section ourselves:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
-    ... 
+    ...
     ... [zope3]
     ... location = %(zope3)s
     ...
@@ -966,7 +900,7 @@ the address option which accepts zero or more address specifications:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
-    ... 
+    ...
     ... [zope3]
     ... location = %(zope3)s
     ...
@@ -1048,7 +982,7 @@ access log:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
-    ... 
+    ...
     ... [zope3]
     ... location = %(zope3)s
     ...
@@ -1123,7 +1057,7 @@ access log:
 
 Let's look at the zdaemon.conf file:
 
-    >>> cat('parts', 'instance', 'zdaemon.conf') 
+    >>> cat('parts', 'instance', 'zdaemon.conf')
     <runner>
       daemon on
       directory /sample-buildout/parts/instance
@@ -1153,7 +1087,7 @@ simply provide a zdaemon.conf option in your instance section:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
-    ... 
+    ...
     ... [zope3]
     ... location = %(zope3)s
     ...
@@ -1178,7 +1112,7 @@ simply provide a zdaemon.conf option in your instance section:
     ... application = myapp
     ... zope.conf = ${database:zconfig}
     ... address = 8081
-    ... zdaemon.conf = 
+    ... zdaemon.conf =
     ...     <runner>
     ...       daemon off
     ...       socket-name /sample-buildout/parts/instance/sock
@@ -1271,7 +1205,7 @@ options used by the instance recipe:
 etc-directory
     The name of the directory where configuration files should be
     placed.  This defaults to /etc/NAME, where NAME is the deployment
-    name. 
+    name.
 
 log-directory
     The name of the directory where application instances should write
@@ -1306,7 +1240,7 @@ create a faux installation root:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
-    ... 
+    ...
     ... [zope3]
     ... location = %(zope3)s
     ...
@@ -1450,7 +1384,7 @@ Let's update our buildout to add a new instance:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance instance2
-    ... 
+    ...
     ... [zope3]
     ... location = %(zope3)s
     ...
