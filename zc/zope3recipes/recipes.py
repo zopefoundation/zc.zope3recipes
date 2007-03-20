@@ -61,7 +61,7 @@ class App:
 
         try:
             z3path = options['zope3-location']
-        except:
+        except KeyError:
             path = ''
         else:
             if not os.path.exists(z3path):
