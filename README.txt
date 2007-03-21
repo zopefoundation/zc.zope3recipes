@@ -12,3 +12,12 @@ distinguishing features:
 - Don't support package-includes
 
 .. contents::
+
+Releases
+********
+
+==================
+0.5.0 (2007/03/21)
+==================
+
+Support building Zope 3 application solely from eggs.
