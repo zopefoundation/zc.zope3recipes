@@ -5,7 +5,7 @@ Zope3 Application and Instance Recipes
 Somewhat experimental recipes for creating Zope 3 instances with
 distinguishing features:
 
-- Don't use a skeletin
+- Don't use a skeleton
 
 - Seprates application and instance definition
 
