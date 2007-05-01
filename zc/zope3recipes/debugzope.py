@@ -21,7 +21,7 @@ import zope.app.debug
 import zope.app.twisted.main
 import zope.app.appsetup.interfaces
 from zope.event import notify
-
+import zope.app.appsetup.product
 
 def load_options(args):
     options = zope.app.twisted.main.ZopeOptions()
@@ -36,6 +36,7 @@ def load_options(args):
 
 
 def zglobals(options):
+    zope.app.appsetup.product.setProductConfigurations(options.product_config)
     zope.app.appsetup.config(options.site_definition)
     db = zope.app.appsetup.appsetup.multi_database(options.databases)[0][0]
     notify(zope.app.appsetup.interfaces.DatabaseOpened(db))
