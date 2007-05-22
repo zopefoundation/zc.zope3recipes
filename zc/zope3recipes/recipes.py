@@ -213,14 +213,14 @@ class Instance:
             zope_conf = options.get('zope.conf', '')+'\n'
             zope_conf = ZConfigParse(cStringIO.StringIO(zope_conf))
 
-            zope_conf['site-definition'] = os.path.join(app_loc, 'site.zcml')
+            zope_conf['site-definition'] = [os.path.join(app_loc, 'site.zcml')]
 
             server_type = server_types[options['servers']][1]
             for address in options.get('address', '').split():
                 zope_conf.sections.append(
                     ZConfigSection('server',
-                                   data=dict(type=server_type,
-                                             address=address,
+                                   data=dict(type=[server_type],
+                                             address=[address],
                                              ),
                                    )
                     )
@@ -228,8 +228,8 @@ class Instance:
                     if ('server' in s.type)]:
                 zope_conf.sections.append(
                     ZConfigSection('server',
-                                   data=dict(type=server_type,
-                                             address='8080',
+                                   data=dict(type=[server_type],
+                                             address=['8080'],
                                              ),
                                    )
                     )
@@ -268,7 +268,7 @@ class Instance:
                 zdaemon_conf.sections.insert(0, runner)
             for name, value in defaults.items():
                 if name not in runner:
-                    runner[name] = value
+                    runner.addValue(name, value)
 
             if not [s for s in zdaemon_conf.sections
                     if s.type == 'eventlog']:
@@ -316,15 +316,15 @@ class Instance:
 def access_log(path):
     return ZConfigSection(
         'accesslog', '',
-        sections=[ZConfigSection('logfile', '', dict(path=path))]
+        sections=[ZConfigSection('logfile', '', dict(path=[path]))]
         )
 
 def event_log(path, *data):
     return ZConfigSection(
         'eventlog', '', None,
         [ZConfigSection('logfile', '',
-                        dict(path=path,
-                             formatter='zope.exceptions.log.Formatter',
+                        dict(path=[path],
+                             formatter=['zope.exceptions.log.Formatter'],
                              )
                         )
          ],
@@ -334,7 +334,7 @@ def event_log2(path, *data):
     return ZConfigSection(
         'eventlog', '', None,
         [ZConfigSection('logfile', '',
-                        dict(path=path,
+                        dict(path=[path],
                              )
                         )
          ],
@@ -380,7 +380,10 @@ class ZConfigSection(dict):
         self.type, self.name = type, name
 
     def addValue(self, key, value, *args):
-        self[key] = value
+        if key in self:
+            self[key].append(value)
+        else:
+            self[key] = [value]
 
     def __str__(self, pre=''):
         result = []
@@ -391,8 +394,9 @@ class ZConfigSection(dict):
                 result = ['%s<%s>' % (pre, self.type)]
             pre += '  '
 
-        for name, value in sorted(self.items()):
-            result.append('%s%s %s' % (pre, name, value))
+        for name, values in sorted(self.items()):
+            for value in values:
+                result.append('%s%s %s' % (pre, name, value))
 
         if self.sections and self:
             result.append('')

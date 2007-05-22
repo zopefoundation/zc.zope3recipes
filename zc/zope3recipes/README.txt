@@ -1205,6 +1205,101 @@ in the buildout bin directory:
             ]+sys.argv[1:]
             )
 
+Some configuration sections can include a key multiple times; the ZEO
+client section works this way.  When a key is given multiple times,
+all values are included in the resulting configuration in the order in
+which they're give in the input::
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance
+    ...
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... application = myapp
+    ... zope.conf =
+    ...     <zodb>
+    ...       <zeoclient>
+    ...         server 127.0.0.1:8001
+    ...         server 127.0.0.1:8002
+    ...       </zeoclient>
+    ...     </zodb>
+    ... address = 8081
+    ... zdaemon.conf =
+    ...     <runner>
+    ...       daemon off
+    ...       socket-name /sample-buildout/parts/instance/sock
+    ...       transcript /dev/null
+    ...     </runner>
+    ...     <eventlog>
+    ...     </eventlog>
+    ...
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    buildout: Develop: /sample-buildout/demo1
+    buildout: Develop: /sample-buildout/demo2
+    buildout: Uninstalling instance
+    buildout: Uninstalling database
+    buildout: Updating myapp
+    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
+    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
+    buildout: Installing instance
+    zc.buildout.easy_install: Generated script /sample-buildout/bin/instance.
+
+    >>> cat('parts', 'instance', 'zope.conf')
+    site-definition /sample-buildout/parts/myapp/site.zcml
+    <BLANKLINE>
+    <zodb>
+      <zeoclient>
+        server 127.0.0.1:8001
+        server 127.0.0.1:8002
+      </zeoclient>
+    <BLANKLINE>
+    </zodb>
+    <BLANKLINE>
+    <server>
+      address 8081
+      type HTTP
+    </server>
+    <BLANKLINE>
+    <accesslog>
+      <logfile>
+        path /sample-buildout/parts/instance/access.log
+      </logfile>
+    <BLANKLINE>
+    </accesslog>
+    <BLANKLINE>
+    <eventlog>
+      <logfile>
+        formatter zope.exceptions.log.Formatter
+        path STDOUT
+      </logfile>
+    <BLANKLINE>
+    </eventlog>
+
+
 Log files
 ---------
 
@@ -1316,7 +1411,7 @@ use the deployment.  If we rerun the buildout:
     buildout: Develop: /sample-buildout/demo1
     buildout: Develop: /sample-buildout/demo2
     buildout: Uninstalling instance
-    buildout: Updating database
+    buildout: Installing database
     buildout: Updating myapp
     zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
     zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
