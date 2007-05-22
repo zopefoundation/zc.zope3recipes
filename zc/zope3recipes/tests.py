@@ -43,6 +43,7 @@ ordinary script:
 
     >>> print system(join('bin', 'buildout')),
     buildout: Installing ctl
+    zc.buildout.easy_install: Generated script /sample-buildout/bin/ctl.
 
 We'll create a configuration file:
 
