@@ -2,14 +2,15 @@
 Zope3 Application and Instance Recipes
 **************************************
 
-Somewhat experimental recipes for creating Zope 3 instances with
-distinguishing features:
+Recipes for creating Zope 3 instances with distinguishing features:
 
 - Don't use a skeleton
 
-- Seprates application and instance definition
+- Separates application and instance definition
 
 - Don't support package-includes
+
+Unfortunately, no Windows support at this time.
 
 .. contents::
 
