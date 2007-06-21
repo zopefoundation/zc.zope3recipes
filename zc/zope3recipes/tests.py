@@ -42,8 +42,8 @@ ordinary script:
     ... ''')
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Installing ctl
-    zc.buildout.easy_install: Generated script /sample-buildout/bin/ctl.
+    Installing ctl.
+    Generated script '/sample-buildout/bin/ctl'.
 
 We'll create a configuration file:
 
@@ -109,9 +109,9 @@ There was a bug in the recipe error handling that caused errors to be hidden
 
     >>> print system(join('bin', 'buildout')),
     Couldn't find index page for 'zc.recipe.egg' (maybe misspelled?)
-    buildout: Installing instance
+    Installing instance.
     While:
-      Installing instance
+      Installing instance.
     Error: No database sections have been defined.
     """
 

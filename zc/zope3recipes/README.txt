@@ -98,11 +98,11 @@ the zope namespace.  A configure directive will be included for us.
 Let's run the buildout and see what we get:
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Develop: /sample-buildout/demo1
-    buildout: Develop: /sample-buildout/demo2
-    buildout: Installing myapp
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
 
 A directory is created in the parts directory for our application files:
 
@@ -230,11 +230,9 @@ explicit:
     ... ''' % globals())
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Develop: /sample-buildout/demo1
-    buildout: Develop: /sample-buildout/demo2
-    buildout: Updating myapp
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Updating myapp.
 
 Note that this is recognized as not being a change to the
 configuration; the messages say that myapp was updated, not
@@ -287,12 +285,12 @@ We can also specify the ZServer servers explicitly:
     ... ''' % globals())
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Develop: /sample-buildout/demo1
-    buildout: Develop: /sample-buildout/demo2
-    buildout: Uninstalling myapp
-    buildout: Installing myapp
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling myapp.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
 
 The part has been re-installed, and the runzope script generated is
 different now.  Note that the main() function is imported from a
@@ -350,12 +348,12 @@ file that defines our application with an empty location for zope3:
 Now, Let's run the buildout and see what we get:
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Develop: /sample-buildout/demo1
-    buildout: Develop: /sample-buildout/demo2
-    buildout: Uninstalling myapp
-    buildout: Installing myapp
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling myapp.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
 
 The runzope script runs the Web server:
 
@@ -454,12 +452,12 @@ If we modify our buildout to include an ftesting.zcml option:
     ... ''' % globals())
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Develop: /sample-buildout/demo1
-    buildout: Develop: /sample-buildout/demo2
-    buildout: Uninstalling myapp
-    buildout: Installing myapp
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling myapp.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
 
 We'll get ftesting.zcml files and ftesting-base.zcml files created in
 the application:
@@ -595,15 +593,15 @@ instance part.
 Let's run the buildout, and see what we get:
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Develop: /sample-buildout/demo1
-    buildout: Develop: /sample-buildout/demo2
-    buildout: Uninstalling myapp
-    buildout: Installing database
-    buildout: Installing myapp
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
-    buildout: Installing instance
-    zc.buildout.easy_install: Generated script /sample-buildout/bin/instance.
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling myapp.
+    Installing database.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
+    Installing instance.
+    Generated script '/sample-buildout/bin/instance'.
 
 We see that the database and myapp parts were included by virtue of
 being referenced from the instance part.
@@ -693,16 +691,16 @@ the names of the server types are adjusted appropriately:
     ... ''' % globals())
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Develop: /sample-buildout/demo1
-    buildout: Develop: /sample-buildout/demo2
-    buildout: Uninstalling instance
-    buildout: Uninstalling myapp
-    buildout: Updating database
-    buildout: Installing myapp
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
-    buildout: Installing instance
-    zc.buildout.easy_install: Generated script /sample-buildout/bin/instance.
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
+    Uninstalling myapp.
+    Updating database.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
+    Installing instance.
+    Generated script '/sample-buildout/bin/instance'.
 
 The generated zope.conf file now uses the ZServer server components
 instead:
@@ -775,16 +773,16 @@ The Twisted-based servers can also be specified explicitly:
     ... ''' % globals())
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Develop: /sample-buildout/demo1
-    buildout: Develop: /sample-buildout/demo2
-    buildout: Uninstalling instance
-    buildout: Uninstalling myapp
-    buildout: Updating database
-    buildout: Installing myapp
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
-    buildout: Installing instance
-    zc.buildout.easy_install: Generated script /sample-buildout/bin/instance.
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
+    Uninstalling myapp.
+    Updating database.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
+    Installing instance.
+    Generated script '/sample-buildout/bin/instance'.
 
 The generated zope.conf file now uses the Twisted server components
 once more:
@@ -871,15 +869,13 @@ If we specify a server section ourselves:
     ... ''' % globals())
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Develop: /sample-buildout/demo1
-    buildout: Develop: /sample-buildout/demo2
-    buildout: Uninstalling instance
-    buildout: Updating database
-    buildout: Updating myapp
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
-    buildout: Installing instance
-    zc.buildout.easy_install: Generated script /sample-buildout/bin/instance.
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
+    Updating database.
+    Updating myapp.
+    Installing instance.
+    Generated script '/sample-buildout/bin/instance'.
 
 Then the section (or sections) we provide will be used and new ones
 won't be added:
@@ -953,15 +949,13 @@ the address option which accepts zero or more address specifications:
     ... ''' % globals())
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Develop: /sample-buildout/demo1
-    buildout: Develop: /sample-buildout/demo2
-    buildout: Uninstalling instance
-    buildout: Updating database
-    buildout: Updating myapp
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
-    buildout: Installing instance
-    zc.buildout.easy_install: Generated script /sample-buildout/bin/instance.
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
+    Updating database.
+    Updating myapp.
+    Installing instance.
+    Generated script '/sample-buildout/bin/instance'.
 
     >>> cat('parts', 'instance', 'zope.conf')
     site-definition /sample-buildout/parts/myapp/site.zcml
@@ -1047,15 +1041,13 @@ access log:
     ... ''' % globals())
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Develop: /sample-buildout/demo1
-    buildout: Develop: /sample-buildout/demo2
-    buildout: Uninstalling instance
-    buildout: Updating database
-    buildout: Updating myapp
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
-    buildout: Installing instance
-    zc.buildout.easy_install: Generated script /sample-buildout/bin/instance.
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
+    Updating database.
+    Updating myapp.
+    Installing instance.
+    Generated script '/sample-buildout/bin/instance'.
 
     >>> cat('parts', 'instance', 'zope.conf')
     site-definition /sample-buildout/parts/myapp/site.zcml
@@ -1153,15 +1145,13 @@ simply provide a zdaemon.conf option in your instance section:
     ... ''' % globals())
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Develop: /sample-buildout/demo1
-    buildout: Develop: /sample-buildout/demo2
-    buildout: Uninstalling instance
-    buildout: Updating database
-    buildout: Updating myapp
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
-    buildout: Installing instance
-    zc.buildout.easy_install: Generated script /sample-buildout/bin/instance.
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
+    Updating database.
+    Updating myapp.
+    Installing instance.
+    Generated script '/sample-buildout/bin/instance'.
 
     >>> cat('parts', 'instance', 'zdaemon.conf')
     <runner>
@@ -1258,15 +1248,13 @@ which they're give in the input::
     ... ''' % globals())
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Develop: /sample-buildout/demo1
-    buildout: Develop: /sample-buildout/demo2
-    buildout: Uninstalling instance
-    buildout: Uninstalling database
-    buildout: Updating myapp
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
-    buildout: Installing instance
-    zc.buildout.easy_install: Generated script /sample-buildout/bin/instance.
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
+    Uninstalling database.
+    Updating myapp.
+    Installing instance.
+    Generated script '/sample-buildout/bin/instance'.
 
     >>> cat('parts', 'instance', 'zope.conf')
     site-definition /sample-buildout/parts/myapp/site.zcml
@@ -1408,15 +1396,13 @@ deployment option to our instance part telling the instance recipe to
 use the deployment.  If we rerun the buildout:
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Develop: /sample-buildout/demo1
-    buildout: Develop: /sample-buildout/demo2
-    buildout: Uninstalling instance
-    buildout: Installing database
-    buildout: Updating myapp
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
-    buildout: Installing instance
-    zc.buildout.easy_install: Generated script /root/etc/init.d/myapp-run-instance.
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
+    Installing database.
+    Updating myapp.
+    Installing instance.
+    Generated script '/root/etc/init.d/myapp-run-instance'.
 
 The installer files will move.  We'll no-longer have the instance part:
 
@@ -1556,16 +1542,13 @@ Let's update our buildout to add a new instance:
     ... ''' % globals())
 
     >>> print system(join('bin', 'buildout')),
-    buildout: Develop: /sample-buildout/demo1
-    buildout: Develop: /sample-buildout/demo2
-    buildout: Updating database
-    buildout: Updating myapp
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/runzope.
-    zc.buildout.easy_install: Generated script /sample-buildout/parts/myapp/debugzope.
-    buildout: Updating instance
-    zc.buildout.easy_install: Generated script /root/etc/init.d/myapp-run-instance.
-    buildout: Installing instance2
-    zc.buildout.easy_install: Generated script /root/etc/init.d/myapp-run-instance2.
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Updating database.
+    Updating myapp.
+    Updating instance.
+    Installing instance2.
+    Generated script '/root/etc/init.d/myapp-run-instance2'.
 
 Now, we have the new instance configuration files:
 
