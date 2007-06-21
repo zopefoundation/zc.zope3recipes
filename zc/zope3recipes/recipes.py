@@ -18,7 +18,7 @@ import os, shutil
 import zc.buildout
 import zc.recipe.egg
 import pkg_resources
-import ZConfig.cfgparser
+import ZConfig.schemaless
 import cStringIO
 
 this_loc = pkg_resources.working_set.find(
@@ -211,27 +211,24 @@ class Instance:
             app_loc = options['application-location']
 
             zope_conf = options.get('zope.conf', '')+'\n'
-            zope_conf = ZConfigParse(cStringIO.StringIO(zope_conf))
+            zope_conf = ZConfig.schemaless.loadConfigFile(
+                cStringIO.StringIO(zope_conf))
 
             zope_conf['site-definition'] = [os.path.join(app_loc, 'site.zcml')]
 
             server_type = server_types[options['servers']][1]
             for address in options.get('address', '').split():
                 zope_conf.sections.append(
-                    ZConfigSection('server',
-                                   data=dict(type=[server_type],
-                                             address=[address],
-                                             ),
-                                   )
+                    ZConfig.schemaless.Section(
+                        'server',
+                        data=dict(type=[server_type], address=[address]))
                     )
             if not [s for s in zope_conf.sections
                     if ('server' in s.type)]:
                 zope_conf.sections.append(
-                    ZConfigSection('server',
-                                   data=dict(type=[server_type],
-                                             address=['8080'],
-                                             ),
-                                   )
+                    ZConfig.schemaless.Section(
+                        'server',
+                        data=dict(type=[server_type], address=['8080']))
                     )
 
             if not [s for s in zope_conf.sections if s.type == 'zodb']:
@@ -246,7 +243,8 @@ class Instance:
 
 
             zdaemon_conf = options.get('zdaemon.conf', '')+'\n'
-            zdaemon_conf = ZConfigParse(cStringIO.StringIO(zdaemon_conf))
+            zdaemon_conf = ZConfig.schemaless.loadConfigFile(
+                cStringIO.StringIO(zdaemon_conf))
 
             defaults = {
                 'program': "%s -C %s" % (os.path.join(app_loc, 'runzope'),
@@ -264,11 +262,11 @@ class Instance:
             if runner:
                 runner = runner[0]
             else:
-                runner = ZConfigSection('runner')
+                runner = ZConfig.schemaless.Section('runner')
                 zdaemon_conf.sections.insert(0, runner)
             for name, value in defaults.items():
                 if name not in runner:
-                    runner.addValue(name, value)
+                    runner[name] = [value]
 
             if not [s for s in zdaemon_conf.sections
                     if s.type == 'eventlog']:
@@ -314,31 +312,28 @@ class Instance:
     update = install
 
 def access_log(path):
-    return ZConfigSection(
+    return ZConfig.schemaless.Section(
         'accesslog', '',
-        sections=[ZConfigSection('logfile', '', dict(path=[path]))]
+        sections=[ZConfig.schemaless.Section('logfile', '', dict(path=[path]))]
         )
 
 def event_log(path, *data):
-    return ZConfigSection(
+    return ZConfig.schemaless.Section(
         'eventlog', '', None,
-        [ZConfigSection('logfile', '',
-                        dict(path=[path],
-                             formatter=['zope.exceptions.log.Formatter'],
-                             )
-                        )
-         ],
-        )
+        [ZConfig.schemaless.Section(
+             'logfile',
+             '',
+             dict(path=[path], formatter=['zope.exceptions.log.Formatter'])),
+         ])
 
 def event_log2(path, *data):
-    return ZConfigSection(
+    return ZConfig.schemaless.Section(
         'eventlog', '', None,
-        [ZConfigSection('logfile', '',
-                        dict(path=[path],
-                             )
-                        )
-         ],
-        )
+        [ZConfig.schemaless.Section(
+             'logfile',
+             '',
+             dict(path=[path])),
+         ])
 
    
 server_template = """
@@ -365,75 +360,6 @@ event_log_template = """
 </eventlog>
 """
 
-class ZConfigResource:
-
-    def __init__(self, file, url=''):
-        self.file, self.url = file, url
-
-class ZConfigSection(dict):
-
-    def __init__(self, type='', name='', data=None, sections=None):
-        dict.__init__(self)
-        if data:
-            self.update(data)
-        self.sections = sections or []
-        self.type, self.name = type, name
-
-    def addValue(self, key, value, *args):
-        if key in self:
-            self[key].append(value)
-        else:
-            self[key] = [value]
-
-    def __str__(self, pre=''):
-        result = []
-        if self.type:
-            if self.name:
-                result = ['%s<%s %s>' % (pre, self.type, self.name)]
-            else:
-                result = ['%s<%s>' % (pre, self.type)]
-            pre += '  '
-
-        for name, values in sorted(self.items()):
-            for value in values:
-                result.append('%s%s %s' % (pre, name, value))
-
-        if self.sections and self:
-            result.append('')
-
-        for section in self.sections:
-            result.append(section.__str__(pre))
-        
-        if self.type:
-            result.append('%s</%s>' % (pre[:-2], self.type))
-            result.append('')
-                          
-        return '\n'.join(result).rstrip()+'\n'
-  
-class ZConfigContext:
-
-    def __init__(self):
-        self.top = ZConfigSection()
-        self.sections = []
-
-    def startSection(self, container, type, name):
-        newsec = ZConfigSection(type, name)
-        container.sections.append(newsec)
-        return newsec
-
-    def endSection(self, container, type, name, newsect):
-        pass
-
-    def importSchemaComponent(self, pkgname):
-        pass
-
-    def includeConfiguration(self, section, newurl, defines):
-        raise NotImplementedError('includes are not supported')
-
-def ZConfigParse(file):
-    c = ZConfigContext()
-    ZConfig.cfgparser.ZConfigParser(ZConfigResource(file), c).parse(c.top)
-    return c.top
 
 ftesting_base = """
 <configure

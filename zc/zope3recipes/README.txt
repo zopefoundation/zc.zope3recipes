@@ -628,7 +628,6 @@ Let's look at the zope.conf file that was generated:
       <filestorage>
         path /sample-buildout/parts/database/Data.fs
       </filestorage>
-    <BLANKLINE>
     </zodb>
     <BLANKLINE>
     <server>
@@ -640,7 +639,6 @@ Let's look at the zope.conf file that was generated:
       <logfile>
         path /sample-buildout/parts/instance/access.log
       </logfile>
-    <BLANKLINE>
     </accesslog>
     <BLANKLINE>
     <eventlog>
@@ -648,7 +646,6 @@ Let's look at the zope.conf file that was generated:
         formatter zope.exceptions.log.Formatter
         path STDOUT
       </logfile>
-    <BLANKLINE>
     </eventlog>
 
 This uses the twisted server types, since that's the default
@@ -712,7 +709,6 @@ instead:
       <filestorage>
         path /sample-buildout/parts/database/Data.fs
       </filestorage>
-    <BLANKLINE>
     </zodb>
     <BLANKLINE>
     <server>
@@ -724,7 +720,6 @@ instead:
       <logfile>
         path /sample-buildout/parts/instance/access.log
       </logfile>
-    <BLANKLINE>
     </accesslog>
     <BLANKLINE>
     <eventlog>
@@ -732,7 +727,6 @@ instead:
         formatter zope.exceptions.log.Formatter
         path STDOUT
       </logfile>
-    <BLANKLINE>
     </eventlog>
 
 The Twisted-based servers can also be specified explicitly:
@@ -794,7 +788,6 @@ once more:
       <filestorage>
         path /sample-buildout/parts/database/Data.fs
       </filestorage>
-    <BLANKLINE>
     </zodb>
     <BLANKLINE>
     <server>
@@ -806,7 +799,6 @@ once more:
       <logfile>
         path /sample-buildout/parts/instance/access.log
       </logfile>
-    <BLANKLINE>
     </accesslog>
     <BLANKLINE>
     <eventlog>
@@ -814,7 +806,6 @@ once more:
         formatter zope.exceptions.log.Formatter
         path STDOUT
       </logfile>
-    <BLANKLINE>
     </eventlog>
 
 It includes the database definition that we provided in the zope.conf
@@ -887,7 +878,6 @@ won't be added:
       <filestorage>
         path /sample-buildout/parts/database/Data.fs
       </filestorage>
-    <BLANKLINE>
     </zodb>
     <BLANKLINE>
     <server>
@@ -899,7 +889,6 @@ won't be added:
       <logfile>
         path /sample-buildout/parts/instance/access.log
       </logfile>
-    <BLANKLINE>
     </accesslog>
     <BLANKLINE>
     <eventlog>
@@ -907,7 +896,6 @@ won't be added:
         formatter zope.exceptions.log.Formatter
         path STDOUT
       </logfile>
-    <BLANKLINE>
     </eventlog>
 
 If we just want to specify alternate ports or addresses, we can use
@@ -964,7 +952,6 @@ the address option which accepts zero or more address specifications:
       <filestorage>
         path /sample-buildout/parts/database/Data.fs
       </filestorage>
-    <BLANKLINE>
     </zodb>
     <BLANKLINE>
     <server>
@@ -981,7 +968,6 @@ the address option which accepts zero or more address specifications:
       <logfile>
         path /sample-buildout/parts/instance/access.log
       </logfile>
-    <BLANKLINE>
     </accesslog>
     <BLANKLINE>
     <eventlog>
@@ -989,7 +975,6 @@ the address option which accepts zero or more address specifications:
         formatter zope.exceptions.log.Formatter
         path STDOUT
       </logfile>
-    <BLANKLINE>
     </eventlog>
 
 We can specify our own accesslog and eventlog configuration.  For
@@ -1056,7 +1041,6 @@ access log:
       <filestorage>
         path /sample-buildout/parts/database/Data.fs
       </filestorage>
-    <BLANKLINE>
     </zodb>
     <BLANKLINE>
     <eventlog>
@@ -1064,7 +1048,6 @@ access log:
         formatter zope.exceptions.log.Formatter
         path /sample-buildout/parts/instance/event.log
       </logfile>
-    <BLANKLINE>
     </eventlog>
     <BLANKLINE>
     <accesslog>
@@ -1090,7 +1073,6 @@ Let's look at the zdaemon.conf file:
       <logfile>
         path /sample-buildout/parts/instance/z3.log
       </logfile>
-    <BLANKLINE>
     </eventlog>
 
 Here we see a fairly ordinary zdaemon.conf file.  The program option
@@ -1264,7 +1246,6 @@ which they're give in the input::
         server 127.0.0.1:8001
         server 127.0.0.1:8002
       </zeoclient>
-    <BLANKLINE>
     </zodb>
     <BLANKLINE>
     <server>
@@ -1276,7 +1257,6 @@ which they're give in the input::
       <logfile>
         path /sample-buildout/parts/instance/access.log
       </logfile>
-    <BLANKLINE>
     </accesslog>
     <BLANKLINE>
     <eventlog>
@@ -1284,7 +1264,6 @@ which they're give in the input::
         formatter zope.exceptions.log.Formatter
         path STDOUT
       </logfile>
-    <BLANKLINE>
     </eventlog>
 
 
@@ -1442,7 +1421,6 @@ locations:
       <filestorage>
         path /sample-buildout/parts/database/Data.fs
       </filestorage>
-    <BLANKLINE>
     </zodb>
     <BLANKLINE>
     <server>
@@ -1454,7 +1432,6 @@ locations:
       <logfile>
         path /root/var/log/myapp-run/instance-access.log
       </logfile>
-    <BLANKLINE>
     </accesslog>
     <BLANKLINE>
     <eventlog>
@@ -1462,7 +1439,6 @@ locations:
         formatter zope.exceptions.log.Formatter
         path STDOUT
       </logfile>
-    <BLANKLINE>
     </eventlog>
 
     >>> cat(root, 'etc', 'myapp-run', 'instance-zdaemon.conf')
@@ -1479,7 +1455,6 @@ locations:
       <logfile>
         path /root/var/log/myapp-run/instance-z3.log
       </logfile>
-    <BLANKLINE>
     </eventlog>
 
 Defining multiple similar instances
@@ -1565,7 +1540,6 @@ Now, we have the new instance configuration files:
       <filestorage>
         path /sample-buildout/parts/database/Data.fs
       </filestorage>
-    <BLANKLINE>
     </zodb>
     <BLANKLINE>
     <server>
@@ -1577,7 +1551,6 @@ Now, we have the new instance configuration files:
       <logfile>
         path /root/var/log/myapp-run/instance2-access.log
       </logfile>
-    <BLANKLINE>
     </accesslog>
     <BLANKLINE>
     <eventlog>
@@ -1585,5 +1558,4 @@ Now, we have the new instance configuration files:
         formatter zope.exceptions.log.Formatter
         path STDOUT
       </logfile>
-    <BLANKLINE>
     </eventlog>

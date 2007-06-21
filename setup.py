@@ -35,7 +35,7 @@ setup(
     #package_dir = {'':'src'},
     namespace_packages = ['zc'],
     install_requires = ['zc.buildout', 'zope.testing', 'setuptools',
-                        'zc.recipe.egg', 'ZConfig'],
+                        'zc.recipe.egg', 'ZConfig >=2.4a5'],
     dependency_links = ['http://download.zope.org/distribution/'],
     entry_points = {
         'zc.buildout': [
