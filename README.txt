@@ -18,6 +18,13 @@ Releases
 ********
 
 ==================
+0.5.2 (2007/06/21)
+==================
+
+Use ZConfig's schema-free configuration parsing gain support for
+%import.
+
+==================
 0.5.1 (2007/05/22)
 ==================
 
