@@ -315,18 +315,15 @@ different package this time:
 Run Application Solely from Eggs
 --------------------------------
 
-To run a Zope 3 application solely from eggs, value of location in
-zope3 section should be set to empty.  Now we'll create a buildout.cfg
-file that defines our application with an empty location for zope3:
+To run a Zope 3 application solely from eggs, we don't need a zope3
+section at all. Now we'll create a buildout.cfg file that defines our
+application:
 
     >>> write('buildout.cfg',
     ... '''
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = myapp
-    ...
-    ... [zope3]
-    ... location =
     ...
     ... [myapp]
     ... recipe = zc.zope3recipes:app
