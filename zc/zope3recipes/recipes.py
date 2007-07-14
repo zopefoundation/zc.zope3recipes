@@ -41,11 +41,11 @@ class App:
             self.name,
             )
 
-        zope3 = buildout.get(options.get('zope3', 'zope3'))
-        if zope3 is not None and zope3.get('location'):
+        location = buildout[options.get('zope3', 'zope3')]['location']
+        if location:
             options['zope3-location'] = os.path.join(
                 buildout['buildout']['directory'],
-                zope3['location'],
+                location,
                 )
 
         options['servers'] = options.get('servers', 'twisted')
