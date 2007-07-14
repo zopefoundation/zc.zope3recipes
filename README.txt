@@ -18,6 +18,14 @@ Releases
 ********
 
 ==================
+0.5.3 (2007/07/14)
+==================
+
+Created another recipe called 'application' that installs Zope 3
+solely from eggs.  The 'app' recipe is just an extension that also
+supports Zope 3 from checkout or tarball.
+
+==================
 0.5.2 (2007/06/21)
 ==================
 
