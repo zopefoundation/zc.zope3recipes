@@ -8,28 +8,19 @@ and software configuration, expressed as ZCML.  A Zope instance
 invokes the application with a specific instance configuration.  A
 single application may have many instances.
 
-Building Zope 3 Applications
-============================
+Building Zope 3 applications (from eggs)
+========================================
 
-The "app" recipe is used to define a Zope application.  It is designed
-to work with classic Zope releases and with Zope solely as eggs.
-The app recipe causes a part to be created. The part will contain the
-scripts runzope and debugzope and the application's site.zcml.
-Both of the scripts will require providing a -C option and the path to a
-zope.conf file when run.  The debugzope script can be run with a script
-name and arguments, in which case it will run the script, rather than
-starting an interactive session.
+The 'application' recipe can be used to define a Zope application.  It
+is designed to work with with Zope solely from eggs.  The app recipe
+causes a part to be created. The part will contain the scripts runzope
+and debugzope and the application's site.zcml.  Both of the scripts
+will require providing a -C option and the path to a zope.conf file
+when run.  The debugzope script can be run with a script name and
+arguments, in which case it will run the script, rather than starting
+an interactive session.
 
-The app recipe accepts the following options:
-
-zope3
-  The name of a section defining a location option that gives the
-  location of a Zope installation.  This can be either a checkout or a
-  distribution.  If the location has a lib/python subdirectory, it is
-  treated as a distribution, otherwise, it must have a src
-  subdirectory and will be treated as a checkout. This option defaults
-  to "zope3".  And if location is empty, the application will run solely
-  from eggs.
+The 'application' recipe accepts the following options:
 
 site.zcml
   The contents of site.zcml.
@@ -38,13 +29,8 @@ eggs
   The names of one or more eggs, with their dependencies that should
   be included in the Python path of the generated scripts.
 
-Let's look at an example.  We'll make a faux zope installation:
 
-    >>> zope3 = tmpdir('zope3')
-    >>> mkdir(zope3, 'src')
-
-We'll also define some (bogus) eggs that we can use in our
-application:
+Lets define some (bogus) eggs that we can use in our application:
 
     >>> mkdir('demo1')
     >>> write('demo1', 'setup.py',
@@ -60,6 +46,94 @@ application:
     ... setup(name = 'demo2', install_requires='demo1')
     ... ''')
 
+We'll create a buildout.cfg file that defines our application:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = myapp
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:application
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ... ''' % globals())
+
+Now, Let's run the buildout and see what we get:
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
+
+The runzope script runs the Web server:
+
+    >>> cat('parts', 'myapp', 'runzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      '/sample-buildout/demo2',
+      '/sample-buildout/demo1',
+      ]
+    <BLANKLINE>
+    import zope.app.twisted.main
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zope.app.twisted.main.main()
+
+Here, unlike the above example the location path is not included
+in sys.path .  Similarly debugzope script is also changed:
+
+    >>> cat('parts', 'myapp', 'debugzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      '/sample-buildout/demo2',
+      '/sample-buildout/demo1',
+      '/zope3recipes',
+      ]
+    <BLANKLINE>
+    import zc.zope3recipes.debugzope
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zc.zope3recipes.debugzope.debug()
+
+
+Building Zope 3 Applications (from Zope 3 checkouts/tarballs)
+=============================================================
+
+The 'app' recipe works much like the 'application' recipe.  It takes
+the same configuration options plus the following one:
+
+zope3
+  The name of a section defining a location option that gives the
+  location of a Zope installation.  This can be either a checkout or a
+  distribution.  If the location has a lib/python subdirectory, it is
+  treated as a distribution, otherwise, it must have a src
+  subdirectory and will be treated as a checkout. This option defaults
+  to "zope3".  And if location is empty, the application will run solely
+  from eggs.
+
+Let's look at an example.  We'll make a faux zope installation:
+
+    >>> zope3 = tmpdir('zope3')
+    >>> mkdir(zope3, 'src')
 
 Now we'll create a buildout.cfg file that defines our application:
 
@@ -100,6 +174,7 @@ Let's run the buildout and see what we get:
     >>> print system(join('bin', 'buildout')),
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
+    Uninstalling myapp.
     Installing myapp.
     Generated script '/sample-buildout/parts/myapp/runzope'.
     Generated script '/sample-buildout/parts/myapp/debugzope'.
@@ -310,84 +385,6 @@ different package this time:
     <BLANKLINE>
     if __name__ == '__main__':
         zope.app.server.main.main()
-
-
-Run Application Solely from Eggs
---------------------------------
-
-To run a Zope 3 application solely from eggs, value of location in
-zope3 section should be set to empty.  Now we'll create a buildout.cfg
-file that defines our application with an empty location for zope3:
-
-    >>> write('buildout.cfg',
-    ... '''
-    ... [buildout]
-    ... develop = demo1 demo2
-    ... parts = myapp
-    ...
-    ... [zope3]
-    ... location =
-    ...
-    ... [myapp]
-    ... recipe = zc.zope3recipes:app
-    ... site.zcml = <include package="demo2" />
-    ...             <principal
-    ...                 id="zope.manager"
-    ...                 title="Manager"
-    ...                 login="jim"
-    ...                 password_manager="SHA1"
-    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
-    ...                 />
-    ...             <grant
-    ...                 role="zope.Manager"
-    ...                 principal="zope.manager"
-    ...                 />
-    ... eggs = demo2
-    ... ''' % globals())
-
-Now, Let's run the buildout and see what we get:
-
-    >>> print system(join('bin', 'buildout')),
-    Develop: '/sample-buildout/demo1'
-    Develop: '/sample-buildout/demo2'
-    Uninstalling myapp.
-    Installing myapp.
-    Generated script '/sample-buildout/parts/myapp/runzope'.
-    Generated script '/sample-buildout/parts/myapp/debugzope'.
-
-The runzope script runs the Web server:
-
-    >>> cat('parts', 'myapp', 'runzope')
-    #!/usr/local/bin/python2.4
-    <BLANKLINE>
-    import sys
-    sys.path[0:0] = [
-      '/sample-buildout/demo2',
-      '/sample-buildout/demo1',
-      ]
-    <BLANKLINE>
-    import zope.app.twisted.main
-    <BLANKLINE>
-    if __name__ == '__main__':
-        zope.app.twisted.main.main()
-
-Here, unlike the above example the location path is not included
-in sys.path .  Similarly debugzope script is also changed:
-
-    >>> cat('parts', 'myapp', 'debugzope')
-    #!/usr/local/bin/python2.4
-    <BLANKLINE>
-    import sys
-    sys.path[0:0] = [
-      '/sample-buildout/demo2',
-      '/sample-buildout/demo1',
-      '/zope3recipes',
-      ]
-    <BLANKLINE>
-    import zc.zope3recipes.debugzope
-    <BLANKLINE>
-    if __name__ == '__main__':
-        zc.zope3recipes.debugzope.debug()
 
 
 Legacy Functional Testing Support

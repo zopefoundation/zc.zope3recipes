@@ -30,9 +30,8 @@ server_types = {
     'zserver': ('zope.app.server.main',  'WSGI-HTTP'),
     }
 
-
-class App:
-
+class Application(object):
+    
     def __init__(self, buildout, name, options):
         self.name, self.options = name, options
 
@@ -40,13 +39,6 @@ class App:
             buildout['buildout']['parts-directory'],
             self.name,
             )
-
-        location = buildout[options.get('zope3', 'zope3')]['location']
-        if location:
-            options['zope3-location'] = os.path.join(
-                buildout['buildout']['directory'],
-                location,
-                )
 
         options['servers'] = options.get('servers', 'twisted')
         if options['servers'] not in server_types:
@@ -59,56 +51,31 @@ class App:
     def install(self):
         options = self.options
 
-        try:
-            z3path = options['zope3-location']
-        except KeyError:
-            path = ''
-        else:
-            if not os.path.exists(z3path):
-                logger.error("The directory, %r, doesn't exist." % z3path)
-                raise zc.buildout.UserError("No directory:", z3path)
-
-            path = os.path.join(z3path, 'lib', 'python')
-            if not os.path.exists(path):
-                path = os.path.join(z3path, 'src')
-                if not os.path.exists(path):
-                    logger.error(
-                        "The directory, %r, isn't a valid checkout or release."
-                        % z3)
-                    raise zc.buildout.UserError(
-                        "Invalid Zope 3 installation:", z3path)
-
         dest = options['location']
         if not os.path.exists(dest):
             os.mkdir(dest)
             created = True
         else:
             created = False
-            
+
         try:
             open(os.path.join(dest, 'site.zcml'), 'w').write(
                 site_zcml_template % self.options['site.zcml']
                 )
-
-            extra = options.get('extra-paths')
-            if extra:
-                extra += '\n' + path
-            else:
-                extra = path
-            options['extra-paths'] = extra
 
             self.egg.install()
             requirements, ws = self.egg.working_set()
 
             # install subprograms and ctl scripts
             server_module = server_types[options['servers']][0]
+            extra_paths = options.get('extra-paths', '')
             zc.buildout.easy_install.scripts(
                 [('runzope', server_module, 'main')],
                 ws, options['executable'], dest,
-                extra_paths = options['extra-paths'].split(),
+                extra_paths = extra_paths.split(),
                 )
 
-            options['extra-paths'] = extra + '\n' + this_loc
+            options['extra-paths'] = extra_paths + '\n' + this_loc
 
             zc.buildout.easy_install.scripts(
                 [('debugzope', 'zc.zope3recipes.debugzope', 'debug')],
@@ -129,10 +96,50 @@ class App:
             if created:
                 shutil.rmtree(dest)
             raise
-        
+
         return dest
 
-    update = install
+    def update(self):
+        self.install()
+
+class App(Application):
+
+    def __init__(self, buildout, name, options):
+        super(App, self).__init__(buildout, name, options)
+
+        location = buildout[options.get('zope3', 'zope3')]['location']
+        if location:
+            options['zope3-location'] = os.path.join(
+                buildout['buildout']['directory'],
+                location,
+                )
+
+    def install(self):
+        options = self.options
+        z3path = options.get('zope3-location')
+        if z3path is not None:    
+            if not os.path.exists(z3path):
+                logger.error("The directory, %r, doesn't exist." % z3path)
+                raise zc.buildout.UserError("No directory:", z3path)
+
+            path = os.path.join(z3path, 'lib', 'python')
+            if not os.path.exists(path):
+                path = os.path.join(z3path, 'src')
+                if not os.path.exists(path):
+                    logger.error(
+                        "The directory, %r, isn't a valid checkout or release."
+                        % z3)
+                    raise zc.buildout.UserError(
+                        "Invalid Zope 3 installation:", z3path)
+
+            extra = options.get('extra-paths')
+            if extra:
+                extra += '\n' + path
+            else:
+                extra = path
+            options['extra-paths'] = extra
+
+        return super(App, self).install()
 
 site_zcml_template = """\
 <configure xmlns='http://namespaces.zope.org/zope'

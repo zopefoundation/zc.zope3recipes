@@ -39,6 +39,7 @@ setup(
     dependency_links = ['http://download.zope.org/distribution/'],
     entry_points = {
         'zc.buildout': [
+             'application = %s.recipes:Application' % name,
              'app = %s.recipes:App' % name,
              'instance = %s.recipes:Instance' % name,
              ]
