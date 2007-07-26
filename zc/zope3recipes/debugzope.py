@@ -18,15 +18,14 @@ $Id$
 
 import os, sys, traceback
 import zope.app.debug
-import zope.app.twisted.main
 import zope.app.appsetup.interfaces
 from zope.event import notify
 import zope.app.appsetup.product
 
-def load_options(args):
-    options = zope.app.twisted.main.ZopeOptions()
+def load_options(args, main_module=None):
+    options = main_module.ZopeOptions()
     options.schemadir = os.path.dirname(os.path.abspath(
-        zope.app.twisted.main.__file__))
+        main_module.__file__))
     options.positional_args_allowed = True
     options.realize(args)
 
@@ -52,11 +51,11 @@ def zglobals(options):
         __name__ = '__main__',
         )
 
-def debug(args=None):
+def debug(args=None, main_module=None):
     if args is None:
         args = sys.argv[1:]
 
-    options = load_options(args)
+    options = load_options(args, main_module=main_module)
     try:
         globs = zglobals(options.configroot)
     except:

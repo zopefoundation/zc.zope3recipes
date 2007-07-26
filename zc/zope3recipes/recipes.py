@@ -77,10 +77,14 @@ class Application(object):
 
             options['extra-paths'] = extra_paths + '\n' + this_loc
 
+            initialization = 'import %s\n' % server_module
+            arguments = 'main_module=%s' % server_module
             zc.buildout.easy_install.scripts(
                 [('debugzope', 'zc.zope3recipes.debugzope', 'debug')],
                 ws, options['executable'], dest,
                 extra_paths = options['extra-paths'].split(),
+                initialization = initialization,
+                arguments = arguments,
                 )
 
             ftesting_zcml = options.get('ftesting.zcml')

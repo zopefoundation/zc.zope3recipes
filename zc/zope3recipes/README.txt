@@ -109,10 +109,13 @@ in sys.path .  Similarly debugzope script is also changed:
       '/zope3recipes',
       ]
     <BLANKLINE>
+    import zope.app.twisted.main
+    <BLANKLINE>
+    <BLANKLINE>
     import zc.zope3recipes.debugzope
     <BLANKLINE>
     if __name__ == '__main__':
-        zc.zope3recipes.debugzope.debug()
+        zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main)
 
 
 Building Zope 3 Applications (from Zope 3 checkouts/tarballs)
@@ -262,10 +265,13 @@ variables available as global variables.
       '/zope3recipes',
       ]
     <BLANKLINE>
+    import zope.app.twisted.main
+    <BLANKLINE>
+    <BLANKLINE>
     import zc.zope3recipes.debugzope
     <BLANKLINE>
     if __name__ == '__main__':
-        zc.zope3recipes.debugzope.debug()
+        zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main)
 
 Note that the runzope shown above uses the default, twisted-based
 server components.  It's possible to specify which set of server
@@ -385,6 +391,27 @@ different package this time:
     <BLANKLINE>
     if __name__ == '__main__':
         zope.app.server.main.main()
+
+The debugzope script has also been modified to take this into account.
+
+    >>> cat('parts', 'myapp', 'debugzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      '/sample-buildout/demo2',
+      '/sample-buildout/demo1',
+      '/zope3/src',
+      '/zope3recipes',
+      ]
+    <BLANKLINE>
+    import zope.app.server.main
+    <BLANKLINE>
+    <BLANKLINE>
+    import zc.zope3recipes.debugzope
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zc.zope3recipes.debugzope.debug(main_module=zope.app.server.main)
 
 
 Legacy Functional Testing Support
