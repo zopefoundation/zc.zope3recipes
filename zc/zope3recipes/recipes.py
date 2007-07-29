@@ -14,7 +14,7 @@
 """Collected Zope 3 recipes
 """
 
-import os, shutil
+import os, sys, shutil
 import zc.buildout
 import zc.recipe.egg
 import pkg_resources
@@ -29,6 +29,10 @@ server_types = {
     'twisted': ('zope.app.twisted.main', 'HTTP'),
     'zserver': ('zope.app.server.main',  'WSGI-HTTP'),
     }
+
+WIN = False
+if sys.platform[:3].lower() == "win":
+    WIN = True
 
 class Application(object):
     
@@ -292,22 +296,40 @@ class Instance:
             open(zope_conf_path, 'w').write(str(zope_conf))
             open(zdaemon_conf_path, 'w').write(str(zdaemon_conf))
 
-            zc.buildout.easy_install.scripts(
-                [(rc, 'zc.zope3recipes.ctl', 'main')],
-                ws, options['executable'], options['bin-directory'],
-                extra_paths = [this_loc],
-                arguments = ('['
-                             '\n        %r,'
-                             '\n        %r,'
-                             '\n        %r, %r,'
-                             '\n        ]+sys.argv[1:]'
-                             '\n        '
-                             % (os.path.join(app_loc, 'debugzope'),
-                                zope_conf_path,
-                                '-C', zdaemon_conf_path,
-                                )
-                             ),
-                )
+            if WIN:
+                zc.buildout.easy_install.scripts(
+                    [(rc, 'zc.zope3recipes.winctl', 'main')],
+                    ws, options['executable'], options['bin-directory'],
+                    extra_paths = [this_loc],
+                    arguments = ('['
+                                 '\n        %r,'
+                                 '\n        %r,'
+                                 '\n        %r, %r,'
+                                 '\n        ]+sys.argv[1:]'
+                                 '\n        '
+                                 % (os.path.join(app_loc, 'debugzope'),
+                                    zope_conf_path,
+                                    '-C', zdaemon_conf_path,
+                                    )
+                                 ),
+                    )
+            else:
+                zc.buildout.easy_install.scripts(
+                    [(rc, 'zc.zope3recipes.ctl', 'main')],
+                    ws, options['executable'], options['bin-directory'],
+                    extra_paths = [this_loc],
+                    arguments = ('['
+                                 '\n        %r,'
+                                 '\n        %r,'
+                                 '\n        %r, %r,'
+                                 '\n        ]+sys.argv[1:]'
+                                 '\n        '
+                                 % (os.path.join(app_loc, 'debugzope'),
+                                    zope_conf_path,
+                                    '-C', zdaemon_conf_path,
+                                    )
+                                 ),
+                    )
 
             return creating
 

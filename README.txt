@@ -10,9 +10,17 @@ Recipes for creating Zope 3 instances with distinguishing features:
 
 - Don't support package-includes
 
-Unfortunately, no Windows support at this time.
+Unfortunately, partial Windows support at this time. It works but it's alpha.
 
 .. contents::
+
+
+Trunk
+*****
+
+Added windows support. Included a custom ZDCmd and a suprocess wrapper 
+in winctl.py. Now the basic commands will also work on a windows box.
+
 
 Releases
 ********

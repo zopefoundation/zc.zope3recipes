@@ -140,19 +140,22 @@ checker = renormalizing.RENormalizing([
     ),
     ])
 
+
 def test_suite():
-    return unittest.TestSuite((
-        doctest.DocTestSuite(
+    suite = unittest.TestSuite()
+    if sys.platform[:3].lower() == "win":
+        suite.addTest(doctest.DocFileSuite('WINDOWS.txt',
             setUp=setUp, tearDown=zc.buildout.testing.buildoutTearDown,
-            checker=checker,
-            ),
-        doctest.DocFileSuite(
-            'README.txt',
+            checker=checker))
+    else:
+        suite.addTest(doctest.DocTestSuite(
             setUp=setUp, tearDown=zc.buildout.testing.buildoutTearDown,
-            checker=checker,
-            ),
-        
-        ))
+            checker=checker))
+        suite.addTest(doctest.DocFileSuite('README.txt',
+            setUp=setUp, tearDown=zc.buildout.testing.buildoutTearDown,
+            checker=checker))
+
+    return suite
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
