@@ -25,9 +25,9 @@ in winctl.py. Now the basic commands will also work on a windows box.
 Releases
 ********
 
-================
-0.6 (2007/08/21)
-================
+==================
+0.6b1 (2007/08/21)
+==================
 
 Windows support was added.
 
