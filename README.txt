@@ -25,6 +25,18 @@ in winctl.py. Now the basic commands will also work on a windows box.
 Releases
 ********
 
+================
+0.6 (2007/08/21)
+================
+
+Windows support was added.
+
+==================
+0.5.5 (2007/07/26)
+==================
+
+Now debugzope takes the servers key of the application into account.
+
 ==================
 0.5.3 (2007/07/14)
 ==================
