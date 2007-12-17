@@ -1290,6 +1290,106 @@ which they're give in the input::
       </logfile>
     </eventlog>
 
+Specifying an alternate site definition
+---------------------------------------
+
+Ideally, ZCML is used to configure the software used by an application
+and zope.conf is used to provide instance-specific configuration.  For
+historical reasons, there are ZCML directives that provide process
+configuration.  A good example of this is the smtpMailer directive
+provided by the zope.sendmail package.  We can override the
+site-definition option in the zope.conf file to specify an alternate
+zcml file.  Here, we'll update out instance configuration to use an
+alternate site definition:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance
+    ...
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... application = myapp
+    ... zope.conf =
+    ...     site-definition ${buildout:directory}/site.zcml
+    ...     <zodb>
+    ...       <zeoclient>
+    ...         server 127.0.0.1:8001
+    ...         server 127.0.0.1:8002
+    ...       </zeoclient>
+    ...     </zodb>
+    ... address = 8081
+    ... zdaemon.conf =
+    ...     <runner>
+    ...       daemon off
+    ...       socket-name /sample-buildout/parts/instance/sock
+    ...       transcript /dev/null
+    ...     </runner>
+    ...     <eventlog>
+    ...     </eventlog>
+    ...
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
+    Updating myapp.
+    Installing instance.
+    Generated script '/sample-buildout/bin/instance'.
+
+    >>> cat('parts', 'instance', 'zope.conf')
+    site-definition /sample-buildout/site.zcml
+    <BLANKLINE>
+    <zodb>
+      <zeoclient>
+        server 127.0.0.1:8001
+        server 127.0.0.1:8002
+      </zeoclient>
+    </zodb>
+    <BLANKLINE>
+    <server>
+      address 8081
+      type HTTP
+    </server>
+    <BLANKLINE>
+    <accesslog>
+      <logfile>
+        path /sample-buildout/parts/instance/access.log
+      </logfile>
+    </accesslog>
+    <BLANKLINE>
+    <eventlog>
+      <logfile>
+        formatter zope.exceptions.log.Formatter
+        path STDOUT
+      </logfile>
+    </eventlog>
+
+(Note that, in practice, you'll often use the
+zc.recipe.deployment:configuration recipe,
+http://pypi.python.org/pypi/zc.recipe.deployment#configuration-files,
+to define a site.zcml file using the buildout.)
 
 Log files
 ---------

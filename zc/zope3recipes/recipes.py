@@ -229,7 +229,10 @@ class Instance:
             zope_conf = ZConfig.schemaless.loadConfigFile(
                 cStringIO.StringIO(zope_conf))
 
-            zope_conf['site-definition'] = [os.path.join(app_loc, 'site.zcml')]
+            if 'site-definition' not in zope_conf:
+                zope_conf['site-definition'] = [
+                    os.path.join(app_loc, 'site.zcml')
+                    ]
 
             server_type = server_types[options['servers']][1]
             for address in options.get('address', '').split():

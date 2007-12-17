@@ -14,16 +14,20 @@ Unfortunately, partial Windows support at this time. It works but it's alpha.
 
 .. contents::
 
-
-Trunk
-*****
-
-Added windows support. Included a custom ZDCmd and a suprocess wrapper 
-in winctl.py. Now the basic commands will also work on a windows box.
-
-
 Releases
 ********
+
+==================
+0.6.1 (2007/12/17)
+==================
+
+Fixed bug: The zope.conf site-definition option could not be overridden. 
+
+==================
+0.6.0 (2007/11/03)
+==================
+
+Final release with Windows support.
 
 ==================
 0.6b1 (2007/08/21)
