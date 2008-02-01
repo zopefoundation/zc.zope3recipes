@@ -115,6 +115,80 @@ There was a bug in the recipe error handling that caused errors to be hidden
     Error: No database sections have been defined.
     """
 
+def work_with_old_zc_deployment():
+    """
+
+    >>> mkdir('demo1')
+    >>> write('demo1', 'setup.py',
+    ... '''
+    ... from setuptools import setup
+    ... setup(name = 'demo1')
+    ... ''')
+
+    >>> mkdir('demo2')
+    >>> write('demo2', 'setup.py',
+    ... '''
+    ... from setuptools import setup
+    ... setup(name = 'demo2', install_requires='demo1')
+    ... ''')
+
+    >>> root = tmpdir('root')
+    >>> mkdir(root, 'etc')
+    >>> mkdir(root, 'etc', 'myapp-run')
+    >>> mkdir(root, 'etc', 'init.d')
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:application
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... application = myapp
+    ... zope.conf = ${database:zconfig}
+    ... address = 8081
+    ... deployment = myapp-run
+    ...
+    ... [database]
+    ... recipe = zc.recipe.filestorage
+    ...
+    ... [myapp-run]
+    ... etc-directory = %(root)s/etc/myapp-run
+    ... rc-directory = %(root)s/etc/init.d
+    ... log-directory = %(root)s/var/log/myapp-run
+    ... run-directory = %(root)s/var/run/myapp-run
+    ... user = zope
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Installing database.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
+    Installing instance.
+    Generated script '/root/etc/init.d/myapp-run-instance'.
+   
+    """
+
 def setUp(test):
     zc.buildout.testing.buildoutSetUp(test)
     zc.buildout.testing.install_develop('zc.zope3recipes', test)

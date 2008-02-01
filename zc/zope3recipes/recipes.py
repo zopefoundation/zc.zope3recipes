@@ -158,6 +158,8 @@ site_zcml_template = """\
 """
 
 class Instance:
+
+    deployment = None
     
     def __init__(self, buildout, name, options):
         self.name, self.options = name, options
@@ -176,8 +178,11 @@ class Instance:
         options['eggs'] = options.get('eggs', 'zdaemon\nsetuptools')
         self.egg = zc.recipe.egg.Egg(buildout, name, options)
 
-        deployment = self.deployment = options.get('deployment')
+        deployment = options.get('deployment')
         if deployment:
+            # Note we use get below to work with old zc.recipe.deployment eggs.
+            self.deployment = buildout[deployment].get('name', deployment)
+            
             options['bin-directory'] = buildout[deployment]['rc-directory']
             options['run-directory'] = buildout[deployment]['run-directory']
             options['log-directory'] = buildout[deployment]['log-directory']

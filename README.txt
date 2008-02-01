@@ -18,6 +18,13 @@ Releases
 ********
 
 ==================
+0.7.0 (2008/02/01)
+==================
+
+Use the deployment name option (as provided by zc.recipe.deployment
+0.6.0 and later) if present.
+
+==================
 0.6.1 (2007/12/17)
 ==================
 

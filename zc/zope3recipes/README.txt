@@ -1481,12 +1481,13 @@ create a faux installation root:
     ... application = myapp
     ... zope.conf = ${database:zconfig}
     ... address = 8081
-    ... deployment = myapp-run
+    ... deployment = myapp-deployment
     ...
     ... [database]
     ... recipe = zc.recipe.filestorage
     ...
-    ... [myapp-run]
+    ... [myapp-deployment]
+    ... name = myapp-run
     ... etc-directory = %(root)s/etc/myapp-run
     ... rc-directory = %(root)s/etc/init.d
     ... log-directory = %(root)s/var/log/myapp-run
@@ -1494,7 +1495,7 @@ create a faux installation root:
     ... user = zope
     ... ''' % globals())
 
-Here we've added a deployment section, myapp-run, and added a
+Here we've added a deployment section, myapp-deployment, and added a
 deployment option to our instance part telling the instance recipe to
 use the deployment.  If we rerun the buildout:
 
@@ -1622,7 +1623,7 @@ Let's update our buildout to add a new instance:
     ... application = myapp
     ... zope.conf = ${database:zconfig}
     ... address = 8081
-    ... deployment = myapp-run
+    ... deployment = myapp-deployment
     ...
     ... [instance2]
     ... recipe = zc.zope3recipes:instance
@@ -1632,7 +1633,8 @@ Let's update our buildout to add a new instance:
     ... [database]
     ... recipe = zc.recipe.filestorage
     ...
-    ... [myapp-run]
+    ... [myapp-deployment]
+    ... name = myapp-run
     ... etc-directory = %(root)s/etc/myapp-run
     ... rc-directory = %(root)s/etc/init.d
     ... log-directory = %(root)s/var/log/myapp-run
