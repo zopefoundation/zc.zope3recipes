@@ -37,11 +37,11 @@ if sys.platform[:3].lower() == "win":
 class Application(object):
     
     def __init__(self, buildout, name, options):
-        self.name, self.options = name, options
+        self.options = options
 
         options['location'] = os.path.join(
             buildout['buildout']['parts-directory'],
-            self.name,
+            name,
             )
 
         options['servers'] = options.get('servers', 'twisted')
@@ -162,7 +162,7 @@ class Instance:
     deployment = None
     
     def __init__(self, buildout, name, options):
-        self.name, self.options = name, options
+        self.name, self.options = options.get('name', name), options
 
         for section in options.get('extends', '').split():
             options.update(
@@ -192,7 +192,7 @@ class Instance:
             options['bin-directory'] = buildout['buildout']['bin-directory']
             options['run-directory'] = os.path.join(
                 buildout['buildout']['parts-directory'],
-                self.name,
+                name,
                 )
             
     def install(self):

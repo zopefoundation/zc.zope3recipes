@@ -22,7 +22,10 @@ Releases
 ==================
 
 Use the deployment name option (as provided by zc.recipe.deployment
-0.6.0 and later) if present.
+0.6.0 and later) if present when generating instance file names.
+
+You can now specify an instance name option that overrides the part
+name for generated files.
 
 ==================
 0.6.1 (2007/12/17)

@@ -117,7 +117,6 @@ in sys.path .  Similarly debugzope script is also changed:
     if __name__ == '__main__':
         zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main)
 
-
 Building Zope 3 Applications (from Zope 3 checkouts/tarballs)
 =============================================================
 
@@ -1290,6 +1289,71 @@ which they're give in the input::
       </logfile>
     </eventlog>
 
+Instance names
+--------------
+
+The instance recipe generates files or directories based on its name,
+which defaults to the part name.  We can specify a different name
+using the name option.  This doesn't effect which parts directory is
+used, but it does affect the name of the run script in bin:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance
+    ...
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... name = server
+    ... application = myapp
+    ... zope.conf =
+    ...     <zodb>
+    ...       <zeoclient>
+    ...         server 127.0.0.1:8001
+    ...         server 127.0.0.1:8002
+    ...       </zeoclient>
+    ...     </zodb>
+    ... address = 8081
+    ... zdaemon.conf =
+    ...     <runner>
+    ...       daemon off
+    ...       socket-name /sample-buildout/parts/instance/sock
+    ...       transcript /dev/null
+    ...     </runner>
+    ...     <eventlog>
+    ...     </eventlog>
+    ...
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
+    Updating myapp.
+    Installing instance.
+    Generated script '/sample-buildout/bin/server'.
+
+
 Specifying an alternate site definition
 ---------------------------------------
 
@@ -1582,6 +1646,107 @@ locations:
       </logfile>
     </eventlog>
 
+If we provide an alternate instance name, that will be reflected in
+the generated files:
+
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance
+    ...
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... name = server
+    ... application = myapp
+    ... zope.conf = ${database:zconfig}
+    ... address = 8081
+    ... deployment = myapp-deployment
+    ...
+    ... [database]
+    ... recipe = zc.recipe.filestorage
+    ...
+    ... [myapp-deployment]
+    ... name = myapp-run
+    ... etc-directory = %(root)s/etc/myapp-run
+    ... rc-directory = %(root)s/etc/init.d
+    ... log-directory = %(root)s/var/log/myapp-run
+    ... run-directory = %(root)s/var/run/myapp-run
+    ... user = zope
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
+    Updating database.
+    Updating myapp.
+    Installing instance.
+    Generated script '/root/etc/init.d/myapp-run-server'.
+
+    >>> cat(root, 'etc', 'myapp-run', 'server-zope.conf')
+    site-definition /sample-buildout/parts/myapp/site.zcml
+    <BLANKLINE>
+    <zodb>
+      <filestorage>
+        path /sample-buildout/parts/database/Data.fs
+      </filestorage>
+    </zodb>
+    <BLANKLINE>
+    <server>
+      address 8081
+      type HTTP
+    </server>
+    <BLANKLINE>
+    <accesslog>
+      <logfile>
+        path /root/var/log/myapp-run/server-access.log
+      </logfile>
+    </accesslog>
+    <BLANKLINE>
+    <eventlog>
+      <logfile>
+        formatter zope.exceptions.log.Formatter
+        path STDOUT
+      </logfile>
+    </eventlog>
+
+    >>> cat(root, 'etc', 'myapp-run', 'server-zdaemon.conf')
+    <runner>
+      daemon on
+      directory /root/var/run/myapp-run
+      program /sample-buildout/parts/myapp/runzope -C /root/etc/myapp-run/server-zope.conf
+      socket-name /root/var/run/myapp-run/server-zdaemon.sock
+      transcript /root/var/log/myapp-run/server-z3.log
+      user zope
+    </runner>
+    <BLANKLINE>
+    <eventlog>
+      <logfile>
+        path /root/var/log/myapp-run/server-z3.log
+      </logfile>
+    </eventlog>
+
 Defining multiple similar instances
 -----------------------------------
 
@@ -1645,9 +1810,11 @@ Let's update our buildout to add a new instance:
     >>> print system(join('bin', 'buildout')),
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
     Updating database.
     Updating myapp.
-    Updating instance.
+    Installing instance.
+    Generated script '/root/etc/init.d/myapp-run-instance'.
     Installing instance2.
     Generated script '/root/etc/init.d/myapp-run-instance2'.
 
