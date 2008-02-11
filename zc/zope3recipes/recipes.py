@@ -15,6 +15,7 @@
 """
 
 import os, sys, shutil
+import logging
 import zc.buildout
 import zc.recipe.egg
 import pkg_resources
@@ -38,6 +39,7 @@ class Application(object):
     
     def __init__(self, buildout, name, options):
         self.options = options
+        self.name = name
 
         options['location'] = os.path.join(
             buildout['buildout']['parts-directory'],
@@ -125,6 +127,7 @@ class App(Application):
     def install(self):
         options = self.options
         z3path = options.get('zope3-location')
+        logger = logging.getLogger(self.name)
         if z3path is not None:    
             if not os.path.exists(z3path):
                 logger.error("The directory, %r, doesn't exist." % z3path)
