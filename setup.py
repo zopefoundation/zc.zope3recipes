@@ -13,7 +13,7 @@ setup(
     description = "ZC Buildout recipe for defining Zope 3 applications",
     license = "ZPL 2.1",
     keywords = "zope3 buildout",
-    url='http://cheeseshop.python.org/pypi/'+name,
+    url='http://pypi.python.org/pypi/'+name,
     long_description = (
         read('README.txt')
         + '\n' +
@@ -27,11 +27,9 @@ setup(
         ),
     packages = find_packages('.'),
     include_package_data = True,
-    #package_dir = {'':'src'},
     namespace_packages = ['zc'],
     install_requires = ['zc.buildout', 'zope.testing', 'setuptools',
                         'zc.recipe.egg', 'ZConfig >=2.4a5'],
-    dependency_links = ['http://download.zope.org/distribution/'],
     entry_points = {
         'zc.buildout': [
              'application = %s.recipes:Application' % name,

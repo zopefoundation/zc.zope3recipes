@@ -12,13 +12,11 @@
 #
 ##############################################################################
 
-import os, re, shutil, sys, tempfile
-import pkg_resources
+import re, sys
 
 import zc.buildout.testing
 
 import unittest
-import zope.testing
 from zope.testing import doctest, renormalizing
 
 
