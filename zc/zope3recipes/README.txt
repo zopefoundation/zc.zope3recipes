@@ -53,6 +53,7 @@ We'll create a buildout.cfg file that defines our application:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = myapp
+    ... offline = true
     ...
     ... [myapp]
     ... recipe = zc.zope3recipes:application
@@ -145,6 +146,7 @@ Now we'll create a buildout.cfg file that defines our application:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = myapp
+    ... offline = true
     ...
     ... [zope3]
     ... location = %(zope3)s
@@ -288,6 +290,7 @@ explicit:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = myapp
+    ... offline = true
     ...
     ... [zope3]
     ... location = %(zope3)s
@@ -343,6 +346,7 @@ We can also specify the ZServer servers explicitly:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = myapp
+    ... offline = true
     ...
     ... [zope3]
     ... location = %(zope3)s
@@ -450,6 +454,7 @@ If we modify our buildout to include an ftesting.zcml option:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = myapp
+    ... offline = true
     ...
     ... [zope3]
     ... location = %(zope3)s
@@ -569,6 +574,7 @@ example:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
+    ... offline = true
     ...
     ... [zope3]
     ... location = %(zope3)s
@@ -681,6 +687,7 @@ the names of the server types are adjusted appropriately:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
+    ... offline = true
     ...
     ... [zope3]
     ... location = %(zope3)s
@@ -760,6 +767,7 @@ The Twisted-based servers can also be specified explicitly:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
+    ... offline = true
     ...
     ... [zope3]
     ... location = %(zope3)s
@@ -850,6 +858,7 @@ If we specify a server section ourselves:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
+    ... offline = true
     ...
     ... [zope3]
     ... location = %(zope3)s
@@ -930,6 +939,7 @@ the address option which accepts zero or more address specifications:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
+    ... offline = true
     ...
     ... [zope3]
     ... location = %(zope3)s
@@ -1010,6 +1020,7 @@ access log:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
+    ... offline = true
     ...
     ... [zope3]
     ... location = %(zope3)s
@@ -1112,6 +1123,7 @@ simply provide a zdaemon.conf option in your instance section:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
+    ... offline = true
     ...
     ... [zope3]
     ... location = %(zope3)s
@@ -1211,6 +1223,7 @@ which they're give in the input::
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
+    ... offline = true
     ...
     ... [zope3]
     ... location = %(zope3)s
@@ -1307,6 +1320,7 @@ alternate site definition:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
+    ... offline = true
     ...
     ... [zope3]
     ... location = %(zope3)s
@@ -1456,6 +1470,7 @@ create a faux installation root:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance
+    ... offline = true
     ...
     ... [zope3]
     ... location = %(zope3)s
@@ -1597,6 +1612,7 @@ Let's update our buildout to add a new instance:
     ... [buildout]
     ... develop = demo1 demo2
     ... parts = instance instance2
+    ... offline = true
     ...
     ... [zope3]
     ... location = %(zope3)s

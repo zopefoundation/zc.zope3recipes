@@ -32,6 +32,7 @@ ordinary script:
     ... '''
     ... [buildout]
     ... parts = ctl
+    ... offline = true
     ...
     ... [ctl]
     ... recipe = zc.recipe.egg
@@ -94,6 +95,7 @@ There was a bug in the recipe error handling that caused errors to be hidden
     ... '''
     ... [buildout]
     ... parts = instance
+    ... offline = true
     ...
     ... [myapp]
     ... location = foo
