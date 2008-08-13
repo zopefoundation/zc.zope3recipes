@@ -42,7 +42,7 @@ ordinary script:
     ... ''')
 
     >>> print system(join('bin', 'buildout')),
-    Installing ctl.
+    Installing ctl...
     Generated script '/sample-buildout/bin/ctl'.
 
 We'll create a configuration file:
@@ -160,15 +160,21 @@ def test_suite():
     suite = unittest.TestSuite()
     if sys.platform[:3].lower() == "win":
         suite.addTest(doctest.DocFileSuite('WINDOWS.txt',
-            setUp=setUp, tearDown=zc.buildout.testing.buildoutTearDown,
-            checker=checker))
+                 setUp=setUp,
+                 tearDown=zc.buildout.testing.buildoutTearDown,
+                 checker=checker,
+                 optionflags = doctest.NORMALIZE_WHITESPACE+doctest.ELLIPSIS))
     else:
         suite.addTest(doctest.DocTestSuite(
-            setUp=setUp, tearDown=zc.buildout.testing.buildoutTearDown,
-            checker=checker))
+            setUp=setUp,
+            tearDown=zc.buildout.testing.buildoutTearDown,
+            checker=checker,
+            optionflags = doctest.NORMALIZE_WHITESPACE+doctest.ELLIPSIS))
         suite.addTest(doctest.DocFileSuite('README.txt',
-            setUp=setUp, tearDown=zc.buildout.testing.buildoutTearDown,
-            checker=checker))
+            setUp=setUp,
+            tearDown=zc.buildout.testing.buildoutTearDown,
+            checker=checker,
+            optionflags = doctest.NORMALIZE_WHITESPACE+doctest.ELLIPSIS))
 
     return suite
 
