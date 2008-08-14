@@ -196,18 +196,13 @@ def setUp(test):
     zc.buildout.testing.install('ZConfig', test)
     zc.buildout.testing.install('zc.recipe.filestorage', test)
     # prevent upgrade during test
-    if not os.path.exists(os.environ['HOME']):
-        os.mkdir(os.environ['HOME'])
-    buildout_defaults_dir = os.path.join(os.environ['HOME'],
-                                        '.buildout')
-    buildout_defaults_file = os.path.join(buildout_defaults_dir,
-                                          'default.cfg')
-    if not os.path.exists(buildout_defaults_dir):
-        os.mkdir(buildout_defaults_dir)
-    if not os.path.exists(buildout_defaults_file):
-        open(buildout_defaults_file, 'w').write(
-        "[buildout]\n"
-        "newest = false")
+    conf_dir = os.path.join(os.path.expanduser('~'), '.buildout')
+    conf_file = os.path.join(conf_dir, 'default.cfg')
+    if not os.path.exists(conf_dir):
+        os.makedirs(conf_dir)
+    if not os.path.exists(conf_file):
+        open(conf_file, 'w').write("[buildout]\n"
+                                   "newest = false")
     else:
         raise RuntimeWarning('Unable to set "newest=false" for tests')
 
