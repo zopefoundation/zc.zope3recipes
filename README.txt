@@ -17,6 +17,12 @@ Unfortunately, partial Windows support at this time. It works but it's alpha.
 Releases
 ********
 ==================
+0.6.3dev (unreleased)
+==================
+
+...
+
+==================
 0.6.2 (2008/08/18)
 ==================
 
