@@ -190,6 +190,7 @@ def work_with_old_zc_deployment():
 def setUp(test):
     zc.buildout.testing.buildoutSetUp(test)
     zc.buildout.testing.install_develop('zc.zope3recipes', test)
+    zc.buildout.testing.install('zope.interface', test)
     zc.buildout.testing.install('zope.testing', test)
     zc.buildout.testing.install('zc.recipe.egg', test)
     zc.buildout.testing.install('zdaemon', test)
