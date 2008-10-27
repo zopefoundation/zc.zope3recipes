@@ -39,10 +39,10 @@ def zglobals(options):
     zope.app.appsetup.config(options.site_definition)
     db = zope.app.appsetup.appsetup.multi_database(options.databases)[0][0]
     notify(zope.app.appsetup.interfaces.DatabaseOpened(db))
-    
+
     if "PYTHONSTARTUP" in os.environ:
         execfile(os.environ["PYTHONSTARTUP"])
-    
+
     app = zope.app.debug.Debugger.fromDatabase(db)
     return dict(
         app = app,
@@ -66,8 +66,8 @@ def debug(args=None, main_module=None):
             import pdb
             pdb.post_mortem(sys.exc_info()[2])
             return
-            
-            
+
+
     args = options.args
 
     if args:

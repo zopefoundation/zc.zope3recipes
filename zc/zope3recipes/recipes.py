@@ -36,7 +36,7 @@ if sys.platform[:3].lower() == "win":
     WIN = True
 
 class Application(object):
-    
+
     def __init__(self, buildout, name, options):
         self.options = options
         self.name = name
@@ -128,7 +128,7 @@ class App(Application):
         options = self.options
         z3path = options.get('zope3-location')
         logger = logging.getLogger(self.name)
-        if z3path is not None:    
+        if z3path is not None:
             if not os.path.exists(z3path):
                 logger.error("The directory, %r, doesn't exist." % z3path)
                 raise zc.buildout.UserError("No directory:", z3path)
@@ -163,7 +163,7 @@ site_zcml_template = """\
 class Instance:
 
     deployment = None
-    
+
     def __init__(self, buildout, name, options):
         self.name, self.options = options.get('name', name), options
 
@@ -185,7 +185,7 @@ class Instance:
         if deployment:
             # Note we use get below to work with old zc.recipe.deployment eggs.
             self.deployment = buildout[deployment].get('name', deployment)
-            
+
             options['bin-directory'] = buildout[deployment]['rc-directory']
             options['run-directory'] = buildout[deployment]['run-directory']
             options['log-directory'] = buildout[deployment]['log-directory']
@@ -197,7 +197,7 @@ class Instance:
                 buildout['buildout']['parts-directory'],
                 name,
                 )
-            
+
     def install(self):
         options = self.options
         run_directory = options['run-directory']
@@ -379,7 +379,7 @@ def event_log2(path, *data):
              dict(path=[path])),
          ])
 
-   
+
 server_template = """
 <server>
   type HTTP

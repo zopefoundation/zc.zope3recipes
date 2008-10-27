@@ -1678,7 +1678,7 @@ test_sane_errors_from_recipe
     ... [instance]
     ... recipe = zc.zope3recipes:instance
     ... application = myapp
-    ... zope.conf = 
+    ... zope.conf =
     ... ''')
 
     >>> print system(join('bin', 'buildout')),

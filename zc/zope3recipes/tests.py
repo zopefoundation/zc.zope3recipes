@@ -102,7 +102,7 @@ There was a bug in the recipe error handling that caused errors to be hidden
     ... [instance]
     ... recipe = zc.zope3recipes:instance
     ... application = myapp
-    ... zope.conf = 
+    ... zope.conf =
     ... ''')
 
     >>> print system(join('bin', 'buildout')),
@@ -184,7 +184,7 @@ def work_with_old_zc_deployment():
     Generated script '/sample-buildout/parts/myapp/debugzope'.
     Installing instance.
     Generated script '/root/etc/init.d/myapp-run-instance'.
-   
+
     """
 
 def setUp(test):
@@ -217,7 +217,7 @@ checker = renormalizing.RENormalizing([
     ), ''),
     (re.compile("""['"][^\n"']+zope3recipes[^\n"']*['"],"""),
      "'/zope3recipes',"),
-    (re.compile('#![^\n]+\n'), ''),                
+    (re.compile('#![^\n]+\n'), ''),
     (re.compile('-\S+-py\d[.]\d(-\S+)?.egg'),
      '-pyN.N.egg',
     ),

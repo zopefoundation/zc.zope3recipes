@@ -85,7 +85,7 @@ def killAll(pid):
 class Popen(subprocess.Popen):
     def recv(self, maxsize=None):
         return self._recv('stdout', maxsize)
-    
+
     def recv_err(self, maxsize=None):
         return self._recv('stderr', maxsize)
 
@@ -98,7 +98,7 @@ class Popen(subprocess.Popen):
         elif maxsize < 1:
             maxsize = 1
         return getattr(self, which), maxsize
-    
+
     def _close(self, which):
         getattr(self, which).close()
         setattr(self, which, None)
@@ -123,7 +123,7 @@ class Popen(subprocess.Popen):
         conn, maxsize = self.get_conn_maxsize(which, maxsize)
         if conn is None:
             return None
-        
+
         try:
             x = msvcrt.get_osfhandle(conn.fileno())
             (read, nAvail, nMessage) = PeekNamedPipe(x, 0)
@@ -137,7 +137,7 @@ class Popen(subprocess.Popen):
             if why[0] in (109, errno.ESHUTDOWN):
                 return self._close(which)
             raise
-        
+
         if self.universal_newlines:
             read = self._translate_newlines(read)
         return read
@@ -162,13 +162,13 @@ class Popen(subprocess.Popen):
 
 
 class ZopectlCmd(zdaemon.zdctl.ZDCmd):
-    """Manages Zope start and stop etc. 
-    
-    This implementation uses a subprocess for execute the given python script. 
+    """Manages Zope start and stop etc.
 
-    There is also a windows service daemon which can get installed with the 
-    install and remove  methods. If a windows service is installed, the 
-    controller dispatches the start and stop commands to the service. If no 
+    This implementation uses a subprocess for execute the given python script.
+
+    There is also a windows service daemon which can get installed with the
+    install and remove  methods. If a windows service is installed, the
+    controller dispatches the start and stop commands to the service. If no
     service is installed, we use the subprocess instead.
     """
 
@@ -256,7 +256,7 @@ class ZopectlCmd(zdaemon.zdctl.ZDCmd):
         if not self.zd_pid:
             print "Zope3 is not running"
             return
-        
+
         killAll(self.zd_pid)
         self.zd_up = 0
         self.zd_pid = 0
@@ -328,7 +328,7 @@ class ZopectlCmd(zdaemon.zdctl.ZDCmd):
 def main(args=None):
     if args is None:
         args = sys.argv[1:]
-    
+
     class Cmd(ZopectlCmd):
         _debugzope = args.pop(0)
         _zope_conf = args.pop(0)

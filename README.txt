@@ -36,7 +36,7 @@ name for generated files.
 0.6.1 (2007/12/17)
 ==================
 
-Fixed bug: The zope.conf site-definition option could not be overridden. 
+Fixed bug: The zope.conf site-definition option could not be overridden.
 
 ==================
 0.6.0 (2007/11/03)

@@ -39,7 +39,7 @@ class ZopectlCmd(zdaemon.zdctl.ZDCmd):
 def main(args=None):
     if args is None:
         args = sys.argv[1:]
-    
+
     class Cmd(ZopectlCmd):
         _debugzope = args.pop(0)
         _zope_conf = args.pop(0)
