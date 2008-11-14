@@ -16,11 +16,13 @@ Unfortunately, partial Windows support at this time. It works but it's alpha.
 
 Releases
 ********
-=====================
-0.6.2dev (unreleased)
-=====================
+
+==================
+0.8.0 (unreleased)
+==================
 
 Added the "newest=false" option in the SetUp to prevent upgrade during tests
+
 
 ==================
 0.7.0 (2008/02/01)
