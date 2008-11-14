@@ -23,6 +23,7 @@ Releases
 
 Added the "newest=false" option in the SetUp to prevent upgrade during tests
 
+Added support for creating logrotate scripts when using a deployment recipe.
 
 ==================
 0.7.0 (2008/02/01)

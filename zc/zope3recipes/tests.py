@@ -134,6 +134,7 @@ def work_with_old_zc_deployment():
     >>> mkdir(root, 'etc')
     >>> mkdir(root, 'etc', 'myapp-run')
     >>> mkdir(root, 'etc', 'init.d')
+    >>> mkdir(root, 'etc', 'logrotate.d')
 
     >>> write('buildout.cfg',
     ... '''
@@ -170,6 +171,7 @@ def work_with_old_zc_deployment():
     ... [myapp-run]
     ... etc-directory = %(root)s/etc/myapp-run
     ... rc-directory = %(root)s/etc/init.d
+    ... logrotate-directory = %(root)s/etc/logrotate.d
     ... log-directory = %(root)s/var/log/myapp-run
     ... run-directory = %(root)s/var/run/myapp-run
     ... user = zope

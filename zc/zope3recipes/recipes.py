@@ -190,6 +190,8 @@ class Instance:
             options['run-directory'] = buildout[deployment]['run-directory']
             options['log-directory'] = buildout[deployment]['log-directory']
             options['etc-directory'] = buildout[deployment]['etc-directory']
+            options['logrotate-directory'] = buildout[deployment][
+                'logrotate-directory']
             options['user'] = buildout[deployment]['user']
         else:
             options['bin-directory'] = buildout['buildout']['bin-directory']
@@ -214,8 +216,11 @@ class Instance:
             socket_path = os.path.join(run_directory,
                                        self.name+'-zdaemon.sock')
             rc = deployment + '-' + self.name
+            logrotate_path = os.path.join(options['logrotate-directory'],
+                                          rc)
             creating = [zope_conf_path, zdaemon_conf_path,
                         os.path.join(options['bin-directory'], rc),
+                        logrotate_path,
                         ]
         else:
             zope_conf_path = os.path.join(run_directory, 'zope.conf')
@@ -306,6 +311,22 @@ class Instance:
 
             open(zope_conf_path, 'w').write(str(zope_conf))
             open(zdaemon_conf_path, 'w').write(str(zdaemon_conf))
+
+            if deployment:
+                logrotate_access_log = logrotate_template % dict(
+                    logfile=access_log_path,
+                    rc=os.path.join(options['bin-directory'], rc),
+                    conf=zdaemon_conf_path,
+                )
+                logrotate_event_log = logrotate_template % dict(
+                    logfile=event_log_path,
+                    rc=os.path.join(options['bin-directory'], rc),
+                    conf=zdaemon_conf_path,
+                )
+                open(logrotate_path, 'w').write(
+                    logrotate_access_log
+                    + '\n\n'
+                    + logrotate_event_log)
 
             if WIN:
                 zc.buildout.easy_install.scripts(
@@ -402,6 +423,15 @@ event_log_template = """
     formatter zope.exceptions.log.Formatter
   </logfile>
 </eventlog>
+"""
+
+logrotate_template = """%(logfile)s {
+  rotate 5
+  weekly
+  postrotate
+    %(rc)s reopen_transcript
+  endscript
+}
 """
 
 

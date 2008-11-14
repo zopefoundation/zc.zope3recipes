@@ -1504,6 +1504,10 @@ rc-directory
     The name of the directory where run-control scripts should be
     installed.
 
+logrotate-directory
+    The name ot the directory where logrotate configuration files should be
+    installed.
+    
 user
     The name of a user that processes should run as.
 
@@ -1516,6 +1520,7 @@ create a faux installation root:
     >>> mkdir(root, 'etc')
     >>> mkdir(root, 'etc', 'myapp-run')
     >>> mkdir(root, 'etc', 'init.d')
+    >>> mkdir(root, 'etc', 'logrotate.d')
 
     >>> write('buildout.cfg',
     ... '''
@@ -1556,6 +1561,7 @@ create a faux installation root:
     ... name = myapp-run
     ... etc-directory = %(root)s/etc/myapp-run
     ... rc-directory = %(root)s/etc/init.d
+    ... logrotate-directory = %(root)s/etc/logrotate.d
     ... log-directory = %(root)s/var/log/myapp-run
     ... run-directory = %(root)s/var/run/myapp-run
     ... user = zope
@@ -1601,6 +1607,12 @@ The control script is in the init.d directory:
 
 Note that the deployment name is added as a prefix of the control
 script name.
+
+The logrotate file is in the logrotate.d directory:
+
+    >>> ls(root, 'etc', 'logrotate.d')
+    -  myapp-run-instance
+
 
 The configuration files have changed to reflect the deployment
 locations:
@@ -1648,6 +1660,25 @@ locations:
       </logfile>
     </eventlog>
 
+    >>> cat(root, 'etc', 'logrotate.d', 'myapp-run-instance')
+    /root/var/log/myapp-run/instance-access.log {
+      rotate 5
+      weekly
+      postrotate
+        /root/etc/init.d/myapp-run-instance reopen_transcript
+      endscript
+    }
+    <BLANKLINE>
+    <BLANKLINE>
+    /root/var/log/myapp-run/instance-z3.log {
+      rotate 5
+      weekly
+      postrotate
+        /root/etc/init.d/myapp-run-instance reopen_transcript
+      endscript
+    }
+    
+
 If we provide an alternate instance name, that will be reflected in
 the generated files:
 
@@ -1692,6 +1723,7 @@ the generated files:
     ... name = myapp-run
     ... etc-directory = %(root)s/etc/myapp-run
     ... rc-directory = %(root)s/etc/init.d
+    ... logrotate-directory = %(root)s/etc/logrotate.d
     ... log-directory = %(root)s/var/log/myapp-run
     ... run-directory = %(root)s/var/run/myapp-run
     ... user = zope
@@ -1749,6 +1781,7 @@ the generated files:
       </logfile>
     </eventlog>
 
+
 Defining multiple similar instances
 -----------------------------------
 
@@ -1804,6 +1837,7 @@ Let's update our buildout to add a new instance:
     ... name = myapp-run
     ... etc-directory = %(root)s/etc/myapp-run
     ... rc-directory = %(root)s/etc/init.d
+    ... logrotate-directory = %(root)s/etc/logrotate.d
     ... log-directory = %(root)s/var/log/myapp-run
     ... run-directory = %(root)s/var/run/myapp-run
     ... user = zope
