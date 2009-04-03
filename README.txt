@@ -18,7 +18,7 @@ Releases
 ********
 
 ==================
-0.8.0 (unreleased)
+0.8.0 (2009/04/03)
 ==================
 
 Added the "newest=false" option in the SetUp to prevent upgrade during tests
