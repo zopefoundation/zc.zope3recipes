@@ -46,7 +46,8 @@ Lets define some (bogus) eggs that we can use in our application:
     ... setup(name = 'demo2', install_requires='demo1')
     ... ''')
 
-.. Please note that the "newest=false" option is set in the test SetUp to prevent upgrades
+.. Please note that the "newest=false" option is set in the test SetUp to
+   prevent upgrades
 
 We'll create a buildout.cfg file that defines our application:
 
