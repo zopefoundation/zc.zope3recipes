@@ -7,7 +7,7 @@ def read(*rnames):
 name = "zc.zope3recipes"
 setup(
     name = name,
-    version = "0.8dev",
+    version = "0.9.0",
     author = "Jim Fulton",
     author_email = "jim@zope.com",
     description = "ZC Buildout recipe for defining Zope 3 applications",
@@ -28,8 +28,12 @@ setup(
     packages = find_packages('.'),
     include_package_data = True,
     namespace_packages = ['zc'],
-    install_requires = ['zc.buildout', 'zope.testing', 'setuptools',
-                        'zc.recipe.egg', 'ZConfig >=2.4a5'],
+    install_requires = [
+        'zc.buildout',
+        'zope.testing',
+        'setuptools',
+        'zc.recipe.egg',
+        'ZConfig >=2.4a5'],
     entry_points = {
         'zc.buildout': [
              'application = %s.recipes:Application' % name,
