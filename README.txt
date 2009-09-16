@@ -21,7 +21,11 @@ Releases
 0.10.0 (unreleased)
 ===================
 
-- ...
+Removed support for creating a logrotate script for the access.log because it
+is not possible to reopen the log with ZDaemons ``reopen_transacript``. Note
+however that is is possible to declare ``when`` and ``interval`` in a logfile
+section to rotate logfiles internally.
+
 
 ==================
 0.9.0 (2009/07/21)

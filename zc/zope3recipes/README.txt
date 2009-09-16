@@ -1662,15 +1662,6 @@ locations:
     </eventlog>
 
     >>> cat(root, 'etc', 'logrotate.d', 'myapp-run-instance')
-    /root/var/log/myapp-run/instance-access.log {
-      rotate 5
-      weekly
-      postrotate
-        /root/etc/init.d/myapp-run-instance reopen_transcript
-      endscript
-    }
-    <BLANKLINE>
-    <BLANKLINE>
     /root/var/log/myapp-run/instance-z3.log {
       rotate 5
       weekly

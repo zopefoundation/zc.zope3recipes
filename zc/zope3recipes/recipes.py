@@ -313,20 +313,12 @@ class Instance:
             open(zdaemon_conf_path, 'w').write(str(zdaemon_conf))
 
             if deployment:
-                logrotate_access_log = logrotate_template % dict(
-                    logfile=access_log_path,
-                    rc=os.path.join(options['bin-directory'], rc),
-                    conf=zdaemon_conf_path,
-                )
                 logrotate_event_log = logrotate_template % dict(
                     logfile=event_log_path,
                     rc=os.path.join(options['bin-directory'], rc),
                     conf=zdaemon_conf_path,
                 )
-                open(logrotate_path, 'w').write(
-                    logrotate_access_log
-                    + '\n\n'
-                    + logrotate_event_log)
+                open(logrotate_path, 'w').write(logrotate_event_log)
 
             if WIN:
                 zc.buildout.easy_install.scripts(
