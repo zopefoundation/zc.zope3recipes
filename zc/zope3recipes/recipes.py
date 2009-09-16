@@ -393,30 +393,6 @@ def event_log2(path, *data):
          ])
 
 
-server_template = """
-<server>
-  type HTTP
-  address %s
-</server>
-"""
-
-access_log_template = """
-<accesslog>
-  <logfile>
-    path %s
-  </logfile>
-</accesslog>
-"""
-
-event_log_template = """
-<eventlog>
-  <logfile>
-    path %s
-    formatter zope.exceptions.log.Formatter
-  </logfile>
-</eventlog>
-"""
-
 logrotate_template = """%(logfile)s {
   rotate 5
   weekly
