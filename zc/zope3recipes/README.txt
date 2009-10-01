@@ -120,6 +120,98 @@ in sys.path .  Similarly debugzope script is also changed:
     if __name__ == '__main__':
         zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main)
 
+
+Relative paths
+--------------
+
+If requested in a buildout configuration, the scripts will be generated
+with relative paths instead of absolute.
+
+Let's change a buildout configuration to include ``relative-paths``.
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = myapp
+    ... relative-paths = true
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:application
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling myapp.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
+
+We get runzope script with relative paths.
+
+    >>> cat('parts', 'myapp', 'runzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import os
+    <BLANKLINE>
+    join = os.path.join
+    base = os.path.dirname(os.path.abspath(os.path.realpath(__file__)))
+    base = os.path.dirname(base)
+    base = os.path.dirname(base)
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      join(base, 'demo2'),
+      join(base, 'demo1'),
+      ]
+    <BLANKLINE>
+    import zope.app.twisted.main
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zope.app.twisted.main.main()
+
+Similarly, debugzope script has relative paths.
+
+    >>> cat('parts', 'myapp', 'debugzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import os
+    <BLANKLINE>
+    join = os.path.join
+    base = os.path.dirname(os.path.abspath(os.path.realpath(__file__)))
+    base = os.path.dirname(base)
+    base = os.path.dirname(base)
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      join(base, 'demo2'),
+      join(base, 'demo1'),
+      '/zope3recipes',
+      ]
+    <BLANKLINE>
+    import zope.app.twisted.main
+    <BLANKLINE>
+    <BLANKLINE>
+    import zc.zope3recipes.debugzope
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main)
+
+
 Building Zope 3 Applications (from Zope 3 checkouts/tarballs)
 =============================================================
 
@@ -403,6 +495,100 @@ The debugzope script has also been modified to take this into account.
     sys.path[0:0] = [
       '/sample-buildout/demo2',
       '/sample-buildout/demo1',
+      '/zope3/src',
+      '/zope3recipes',
+      ]
+    <BLANKLINE>
+    import zope.app.server.main
+    <BLANKLINE>
+    <BLANKLINE>
+    import zc.zope3recipes.debugzope
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zc.zope3recipes.debugzope.debug(main_module=zope.app.server.main)
+
+
+Relative paths
+--------------
+
+We can also request relative paths.
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = myapp
+    ... relative-paths = true
+    ...
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... servers = zserver
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling myapp.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
+
+The runzope script has relative paths.
+
+    >>> cat('parts', 'myapp', 'runzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import os
+    <BLANKLINE>
+    join = os.path.join
+    base = os.path.dirname(os.path.abspath(os.path.realpath(__file__)))
+    base = os.path.dirname(base)
+    base = os.path.dirname(base)
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      join(base, 'demo2'),
+      join(base, 'demo1'),
+      '/zope3/src',
+      ]
+    <BLANKLINE>
+    import zope.app.server.main
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zope.app.server.main.main()
+
+The debugzope script also has relative paths.
+
+    >>> cat('parts', 'myapp', 'debugzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import os
+    <BLANKLINE>
+    join = os.path.join
+    base = os.path.dirname(os.path.abspath(os.path.realpath(__file__)))
+    base = os.path.dirname(base)
+    base = os.path.dirname(base)
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      join(base, 'demo2'),
+      join(base, 'demo1'),
       '/zope3/src',
       '/zope3recipes',
       ]
@@ -1880,3 +2066,88 @@ Now, we have the new instance configuration files:
         path STDOUT
       </logfile>
     </eventlog>
+
+
+Relative paths
+--------------
+
+Relative paths will be used in the control script if they are requested
+in a buildout configuration.
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance
+    ... relative-paths = true
+    ...
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... application = myapp
+    ... zope.conf = ${database:zconfig}
+    ...
+    ... [database]
+    ... recipe = zc.recipe.filestorage
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance2.
+    Uninstalling instance.
+    Uninstalling myapp.
+    Updating database.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
+    Installing instance.
+    Generated script '/sample-buildout/bin/instance'.
+
+    Both ``sys.path`` and arguments to the `ctl` are using relative
+    paths now.
+
+    >>> cat('bin', 'instance')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import os
+    <BLANKLINE>
+    join = os.path.join
+    base = os.path.dirname(os.path.abspath(os.path.realpath(__file__)))
+    base = os.path.dirname(base)
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      join(base, 'eggs/zdaemon-pyN.N.egg'),
+      join(base, 'eggs/setuptools-pyN.N.egg'),
+      join(base, 'eggs/ZConfig-pyN.N.egg'),
+      '/zope3recipes',
+      ]
+    <BLANKLINE>
+    import zc.zope3recipes.ctl
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zc.zope3recipes.ctl.main([
+            join(base, 'parts/myapp/debugzope'),
+            join(base, 'parts/instance/zope.conf'),
+            '-C', join(base, 'parts/instance/zdaemon.conf'),
+            ]+sys.argv[1:]
+            )

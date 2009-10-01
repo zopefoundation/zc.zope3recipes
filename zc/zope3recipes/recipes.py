@@ -79,6 +79,7 @@ class Application(object):
                 [('runzope', server_module, 'main')],
                 ws, options['executable'], dest,
                 extra_paths = extra_paths.split(),
+                relative_paths=self.egg._relative_paths,
                 )
 
             options['extra-paths'] = extra_paths + '\n' + this_loc
@@ -91,6 +92,7 @@ class Application(object):
                 extra_paths = options['extra-paths'].split(),
                 initialization = initialization,
                 arguments = arguments,
+                relative_paths=self.egg._relative_paths,
                 )
 
             ftesting_zcml = options.get('ftesting.zcml')
@@ -320,39 +322,68 @@ class Instance:
                 )
                 open(logrotate_path, 'w').write(logrotate_event_log)
 
+            # XXX: We are using a private zc.buildout.easy_install
+            # function below.  It would be better if self.egg had a
+            # method to install scripts.  All recipe options and
+            # relative path information would be available to the egg
+            # instance and the recipe would have no need to call
+            # zc.buildout.easy_install.scripts directly.  Since that
+            # requires changes to zc.recipe.egg/zc.buildout we are
+            # fixing our immediate need to generate correct relative
+            # paths by using the private API.
+            # This should be done "right" in the future.
+            if self.egg._relative_paths:
+                arg_paths = (
+                    os.path.join(app_loc, 'debugzope'),
+                    zope_conf_path,
+                    zdaemon_conf_path,
+                    )
+                spath, x = zc.buildout.easy_install._relative_path_and_setup(
+                    os.path.join(options['bin-directory'], 'ctl'),
+                    arg_paths,
+                    self.egg._relative_paths,
+                    )
+                rpath = spath.split(',\n  ')
+                debugzope_loc, zope_conf_path, zdaemon_conf_path = rpath
+                arguments = ('['
+                             '\n        %s,'
+                             '\n        %s,'
+                             '\n        %r, %s,'
+                             '\n        ]+sys.argv[1:]'
+                             '\n        '
+                             % (debugzope_loc,
+                                zope_conf_path,
+                                '-C', zdaemon_conf_path,
+                                )
+                             )
+            else:
+                arguments = ('['
+                             '\n        %r,'
+                             '\n        %r,'
+                             '\n        %r, %r,'
+                             '\n        ]+sys.argv[1:]'
+                             '\n        '
+                             % (os.path.join(app_loc, 'debugzope'),
+                                zope_conf_path,
+                                '-C', zdaemon_conf_path,
+                                )
+                             )
+
             if WIN:
                 zc.buildout.easy_install.scripts(
                     [(rc, 'zc.zope3recipes.winctl', 'main')],
                     ws, options['executable'], options['bin-directory'],
-                    extra_paths = [this_loc],
-                    arguments = ('['
-                                 '\n        %r,'
-                                 '\n        %r,'
-                                 '\n        %r, %r,'
-                                 '\n        ]+sys.argv[1:]'
-                                 '\n        '
-                                 % (os.path.join(app_loc, 'debugzope'),
-                                    zope_conf_path,
-                                    '-C', zdaemon_conf_path,
-                                    )
-                                 ),
+                    extra_paths=[this_loc],
+                    arguments=arguments,
+                    relative_paths=self.egg._relative_paths,
                     )
             else:
                 zc.buildout.easy_install.scripts(
                     [(rc, 'zc.zope3recipes.ctl', 'main')],
                     ws, options['executable'], options['bin-directory'],
-                    extra_paths = [this_loc],
-                    arguments = ('['
-                                 '\n        %r,'
-                                 '\n        %r,'
-                                 '\n        %r, %r,'
-                                 '\n        ]+sys.argv[1:]'
-                                 '\n        '
-                                 % (os.path.join(app_loc, 'debugzope'),
-                                    zope_conf_path,
-                                    '-C', zdaemon_conf_path,
-                                    )
-                                 ),
+                    extra_paths=[this_loc],
+                    arguments=arguments,
+                    relative_paths=self.egg._relative_paths,
                     )
 
             return creating

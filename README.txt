@@ -18,7 +18,16 @@ Releases
 ********
 
 ===================
-0.10.0 (unreleased)
+0.11.0 (2009/10/01)
+===================
+
+- Added support and tests for relative paths buildout option.
+- Changed the dependency requirements to >=1.2.0 for zc.buildout and
+  zc.recipe.egg because relative paths are added in these releases.
+- Added missing release date for the previous release (0.10.0).
+
+===================
+0.10.0 (2009/09/16)
 ===================
 
 Removed support for creating a logrotate script for the access.log because it

@@ -29,10 +29,10 @@ setup(
     include_package_data = True,
     namespace_packages = ['zc'],
     install_requires = [
-        'zc.buildout',
+        'zc.buildout >=1.2.0',
         'zope.testing',
         'setuptools',
-        'zc.recipe.egg',
+        'zc.recipe.egg >=1.2.0',
         'ZConfig >=2.4a5'],
     entry_points = {
         'zc.buildout': [
