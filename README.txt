@@ -23,9 +23,8 @@ Releases
 
 - Nothing yet.
 
-
 ===================
-0.11.1 (unreleased)
+0.11.1 (2010/11/12)
 ===================
 
 - Added an environment hook to enable logging for debugzope

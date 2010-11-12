@@ -56,7 +56,7 @@ def debug(args=None, main_module=None):
         args = sys.argv[1:]
 
     options = load_options(args, main_module=main_module)
-    if os.environ.get('zc_debug_logging'):
+    if 'ZC_DEBUG_LOGGING' in os.environ:
         options.configroot.eventlog.startup()
     try:
         globs = zglobals(options.configroot)
