@@ -7,7 +7,7 @@ def read(*rnames):
 name = "zc.zope3recipes"
 setup(
     name = name,
-    version = '0.12.0dev',
+    version = '0.11.1',
     author = "Jim Fulton",
     author_email = "jim@zope.com",
     description = "ZC Buildout recipe for defining Zope 3 applications",
