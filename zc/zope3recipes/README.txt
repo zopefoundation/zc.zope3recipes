@@ -1860,7 +1860,6 @@ locations:
 If we provide an alternate instance name, that will be reflected in
 the generated files:
 
-
     >>> write('buildout.cfg',
     ... '''
     ... [buildout]
@@ -1960,6 +1959,131 @@ the generated files:
     </eventlog>
 
 
+Controlling logrotate configuration
+-----------------------------------
+
+Some applications control their own log rotation policies.  In these
+cases, we don't want the logrotate configuration to be generated.
+
+Setting the logrotate.conf setting affects the configuration.  Setting
+it explicitly controls the content of the logrotate file for the
+instance; setting it to an empty string causes it not to be generated at
+all.
+
+Let's take a look at setting the content to a non-empty value directly:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance
+    ...
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... site.zcml = <include package="demo2" />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... application = myapp
+    ... zope.conf = ${database:zconfig}
+    ... address = 8081
+    ... deployment = myapp-deployment
+    ... logrotate.conf =
+    ...       /root/var/log/myapp-run/instance-z3.log {
+    ...         rotate 10
+    ...         daily
+    ...         postrotate
+    ...           /root/etc/init.d/myapp-run-instance reopen_transcript
+    ...         endscript
+    ...       }
+    ...
+    ... [database]
+    ... recipe = zc.recipe.filestorage
+    ...
+    ... [myapp-deployment]
+    ... name = myapp-run
+    ... etc-directory = %(root)s/etc/myapp-run
+    ... rc-directory = %(root)s/etc/init.d
+    ... logrotate-directory = %(root)s/etc/logrotate.d
+    ... log-directory = %(root)s/var/log/myapp-run
+    ... run-directory = %(root)s/var/run/myapp-run
+    ... user = zope
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
+    Uninstalling myapp.
+    Updating database.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
+    Installing instance.
+    Generated script '/root/etc/init.d/myapp-run-instance'.
+
+    >>> cat(root, 'etc', 'logrotate.d', 'myapp-run-instance')
+    /root/var/log/myapp-run/instance-z3.log {
+      rotate 10
+      daily
+      postrotate
+        /root/etc/init.d/myapp-run-instance reopen_transcript
+      endscript
+    }
+
+If we set ``logrotate.conf`` to an empty string, the file is not generated:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance
+    ...
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... site.zcml = <include package="demo2" />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... application = myapp
+    ... zope.conf = ${database:zconfig}
+    ... address = 8081
+    ... deployment = myapp-deployment
+    ... logrotate.conf =
+    ...
+    ... [database]
+    ... recipe = zc.recipe.filestorage
+    ...
+    ... [myapp-deployment]
+    ... name = myapp-run
+    ... etc-directory = %(root)s/etc/myapp-run
+    ... rc-directory = %(root)s/etc/init.d
+    ... logrotate-directory = %(root)s/etc/logrotate.d
+    ... log-directory = %(root)s/var/log/myapp-run
+    ... run-directory = %(root)s/var/run/myapp-run
+    ... user = zope
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
+    Updating database.
+    Updating myapp.
+    Installing instance.
+    Generated script '/root/etc/init.d/myapp-run-instance'.
+
+    >>> ls(root, 'etc', 'logrotate.d')
+
+
 Defining multiple similar instances
 -----------------------------------
 
@@ -2025,8 +2149,11 @@ Let's update our buildout to add a new instance:
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
+    Uninstalling myapp.
     Updating database.
-    Updating myapp.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
     Installing instance.
     Generated script '/root/etc/init.d/myapp-run-instance'.
     Installing instance2.

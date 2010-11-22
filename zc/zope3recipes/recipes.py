@@ -222,8 +222,20 @@ class Instance:
                                           rc)
             creating = [zope_conf_path, zdaemon_conf_path,
                         os.path.join(options['bin-directory'], rc),
-                        logrotate_path,
                         ]
+            logrotate_conf = options.get("logrotate.conf")
+            if isinstance(logrotate_conf, basestring):
+                if logrotate_conf.strip():
+                    creating.append(logrotate_path)
+                else:
+                    logrotate_conf = None
+            else:
+                logrotate_conf = logrotate_template % dict(
+                    logfile=event_log_path,
+                    rc=os.path.join(options['bin-directory'], rc),
+                    conf=zdaemon_conf_path,
+                )
+                creating.append(logrotate_path)
         else:
             zope_conf_path = os.path.join(run_directory, 'zope.conf')
             zdaemon_conf_path = os.path.join(run_directory, 'zdaemon.conf')
@@ -314,13 +326,8 @@ class Instance:
             open(zope_conf_path, 'w').write(str(zope_conf))
             open(zdaemon_conf_path, 'w').write(str(zdaemon_conf))
 
-            if deployment:
-                logrotate_event_log = logrotate_template % dict(
-                    logfile=event_log_path,
-                    rc=os.path.join(options['bin-directory'], rc),
-                    conf=zdaemon_conf_path,
-                )
-                open(logrotate_path, 'w').write(logrotate_event_log)
+            if deployment and logrotate_conf:
+                open(logrotate_path, 'w').write(logrotate_conf)
 
             # XXX: We are using a private zc.buildout.easy_install
             # function below.  It would be better if self.egg had a

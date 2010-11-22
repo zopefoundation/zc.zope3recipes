@@ -18,10 +18,11 @@ Releases
 ********
 
 ===================
-0.12.0 (unreleased)
+0.12.0 (2010/11/22)
 ===================
 
-- Nothing yet.
+- Provide control for generation of the logrotate configuration, include the
+  ability to suppress it when not desired.
 
 ===================
 0.11.1 (2010/11/12)
