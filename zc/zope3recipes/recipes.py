@@ -75,16 +75,25 @@ class Application(object):
             # install subprograms and ctl scripts
             server_module = server_types[options['servers']][0]
             extra_paths = options.get('extra-paths', '')
+            initialization = options.get('initialization') or ''
             zc.buildout.easy_install.scripts(
                 [('runzope', server_module, 'main')],
                 ws, options['executable'], dest,
-                extra_paths = extra_paths.split(),
+                extra_paths=extra_paths.split(),
+                initialization=initialization,
                 relative_paths=self.egg._relative_paths,
                 )
 
             options['extra-paths'] = extra_paths + '\n' + this_loc
 
-            initialization = 'import %s\n' % server_module
+            initialization = options.get('debug-initialization')
+            if initialization is None:
+                initialization = options.get('initialization')
+            if initialization:
+                initialization += '\n'
+            else:
+                initialization = ''
+            initialization += 'import %s\n' % server_module
             arguments = 'main_module=%s' % server_module
             zc.buildout.easy_install.scripts(
                 [('debugzope', 'zc.zope3recipes.debugzope', 'debug')],
@@ -141,7 +150,7 @@ class App(Application):
                 if not os.path.exists(path):
                     logger.error(
                         "The directory, %r, isn't a valid checkout or release."
-                        % z3)
+                        % z3path)
                     raise zc.buildout.UserError(
                         "Invalid Zope 3 installation:", z3path)
 

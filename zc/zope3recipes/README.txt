@@ -100,7 +100,187 @@ The runzope script runs the Web server:
         zope.app.twisted.main.main()
 
 Here, unlike the above example the location path is not included
-in sys.path .  Similarly debugzope script is also changed:
+in ``sys.path``.  Similarly debugzope script is also changed:
+
+    >>> cat('parts', 'myapp', 'debugzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      '/sample-buildout/demo2',
+      '/sample-buildout/demo1',
+      '/zope3recipes',
+      ]
+    <BLANKLINE>
+    import zope.app.twisted.main
+    <BLANKLINE>
+    <BLANKLINE>
+    import zc.zope3recipes.debugzope
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main)
+
+The ``initialization`` setting can be used to provide a bit of
+additional code that will be included in the runzope and debugzope
+scripts just before the server's main function is called:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = myapp
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:application
+    ... site.zcml = <include package="demo2" />
+    ... eggs = demo2
+    ... initialization =
+    ...     print "Starting application server."
+    ... ''')
+
+Now, Let's run the buildout and see what we get:
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling myapp.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
+
+The runzope and debugzope scripts now include the additional code just
+before server is started:
+
+    >>> cat('parts', 'myapp', 'runzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      '/sample-buildout/demo2',
+      '/sample-buildout/demo1',
+      ]
+    <BLANKLINE>
+    print "Starting application server."
+    <BLANKLINE>
+    import zope.app.twisted.main
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zope.app.twisted.main.main()
+
+    >>> cat('parts', 'myapp', 'debugzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      '/sample-buildout/demo2',
+      '/sample-buildout/demo1',
+      '/zope3recipes',
+      ]
+    <BLANKLINE>
+    print "Starting application server."
+    import zope.app.twisted.main
+    <BLANKLINE>
+    <BLANKLINE>
+    import zc.zope3recipes.debugzope
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main)
+
+If the additional initialization for debugzope needs to be different
+from that of runzope, the ``debug-initialization`` setting can be used.
+If set, that is used for debugzope *instead* of the value of
+``initialization``.
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = myapp
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:application
+    ... site.zcml = <include package="demo2" />
+    ... eggs = demo2
+    ... initialization =
+    ...     print "Starting application server."
+    ... debug-initialization =
+    ...     print "Starting debugging interaction."
+    ... ''')
+
+Now, Let's run the buildout and see what we get:
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling myapp.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
+
+    >>> cat('parts', 'myapp', 'debugzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      '/sample-buildout/demo2',
+      '/sample-buildout/demo1',
+      '/zope3recipes',
+      ]
+    <BLANKLINE>
+    print "Starting debugging interaction."
+    import zope.app.twisted.main
+    <BLANKLINE>
+    <BLANKLINE>
+    import zc.zope3recipes.debugzope
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main)
+
+The runzope script still uses the ``initialization`` setting::
+
+    >>> cat('parts', 'myapp', 'runzope')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+      '/sample-buildout/demo2',
+      '/sample-buildout/demo1',
+      ]
+    <BLANKLINE>
+    print "Starting application server."
+    <BLANKLINE>
+    import zope.app.twisted.main
+    <BLANKLINE>
+    if __name__ == '__main__':
+        zope.app.twisted.main.main()
+
+Setting ``debug-initialization`` to an empty string suppresses the
+``initialization`` setting for the debugzope script:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = myapp
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:application
+    ... site.zcml = <include package="demo2" />
+    ... eggs = demo2
+    ... initialization =
+    ...     print "Starting application server."
+    ... debug-initialization =
+    ... ''')
+
+Now, Let's run the buildout and see what we get:
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling myapp.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
 
     >>> cat('parts', 'myapp', 'debugzope')
     #!/usr/local/bin/python2.4

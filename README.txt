@@ -18,6 +18,13 @@ Releases
 ********
 
 ===================
+0.13.0 (2010/11/24)
+===================
+
+- Support inserting additional code into the runzope & debugzope scripts
+  using ``initialization`` and ``debug-initialization``.
+
+===================
 0.12.0 (2010/11/22)
 ===================
 
