@@ -40,16 +40,26 @@ def zglobals(options):
     db = zope.app.appsetup.appsetup.multi_database(options.databases)[0][0]
     notify(zope.app.appsetup.interfaces.DatabaseOpened(db))
 
-    if "PYTHONSTARTUP" in os.environ:
-        execfile(os.environ["PYTHONSTARTUP"])
+    globs = {"__name__": "__main__"}
+    startup = os.environ.get("PYTHONSTARTUP")
+    if startup:
+        try:
+            f = open(startup)
+        except (OSError, IOError):
+            # Not readable or not there, which is allowed.
+            pass
+        else:
+            f.close()
+            globs["__file__"] = startup
+            execfile(startup, globs, globs)
+            del globs["__file__"]
 
     app = zope.app.debug.Debugger.fromDatabase(db)
-    return dict(
-        app = app,
-        debugger = app,
-        root = app.root(),
-        __name__ = '__main__',
-        )
+    globs["app"] = app
+    globs["debugger"] = app
+    globs["root"] = app.root()
+
+    return globs
 
 def debug(args=None, main_module=None):
     if args is None:
