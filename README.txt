@@ -14,8 +14,17 @@ Unfortunately, partial Windows support at this time. It works but it's alpha.
 
 .. contents::
 
+
 Releases
 ********
+
+===================
+0.13.1 (unreleased)
+===================
+
+- Execute $PYTHONSTARTUP in the environment that the user will interact
+  with in zc.zope3recipes.debugzope; this mirrors how $PYTHONSTARTUP is
+  used with an interactive interpreter.
 
 ===================
 0.13.0 (2010/11/24)
