@@ -456,9 +456,15 @@ Let's run the buildout and see what we get:
     Generated script '/sample-buildout/parts/myapp/runzope'.
     Generated script '/sample-buildout/parts/myapp/debugzope'.
 
-A directory is created in the parts directory for our application files:
+A directory is created in the parts directory for our application
+files. Starting with zc.buildout >= v1.5, and distribute, a "buildout"
+directory is created in the parts folder. Since the minimum version we support
+for zc.buildout is lower than v1.5, we use a custom "ls" functional called
+"ls_optional" to which we pass a list of folders that may be present. These are
+ignore by the function.
 
-    >>> ls('parts')
+    >>> from zc.zope3recipes.tests import ls_optional
+    >>> ls_optional('parts', ignore=('buildout',))
     d  myapp
 
     >>> ls('parts', 'myapp')
@@ -1000,7 +1006,7 @@ being referenced from the instance part.
 
 We get new directories for our database and instance:
 
-    >>> ls('parts')
+    >>> ls_optional('parts', ignore=('buildout',))
     d  database
     d  instance
     d  myapp
@@ -1949,7 +1955,7 @@ use the deployment.  If we rerun the buildout:
 
 The installer files will move.  We'll no-longer have the instance part:
 
-    >>> ls('parts')
+    >>> ls_optional('parts', ignore=('buildout',))
     d  database
     d  myapp
 
