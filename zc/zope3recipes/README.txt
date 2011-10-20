@@ -2464,3 +2464,253 @@ in a buildout configuration.
             '-C', join(base, 'parts/instance/zdaemon.conf'),
             ]+sys.argv[1:]
             )
+
+
+Offline recipe
+==============
+
+The offline recipe creates a script that in some ways is a syntactic sugar for
+"bin/instance debug" or "bin/instance run <script>". With the offline script,
+all you do is "bin/offline" or "bin/offline </script>". This script doesn't
+create additional folders like the ``Instance`` recipe; it expects two options:
+"application" and "zope.conf" that must be sections for a Zope3 application and
+a configuration file (that supports a "location" option) to exist.
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance offline
+    ...
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... name = server
+    ... application = myapp
+    ... zope.conf =
+    ...     <zodb>
+    ...       <zeoclient>
+    ...         server 127.0.0.1:8001
+    ...         server 127.0.0.1:8002
+    ...       </zeoclient>
+    ...     </zodb>
+    ... address = 8081
+    ... zdaemon.conf =
+    ...     <runner>
+    ...       daemon off
+    ...       socket-name /sample-buildout/parts/instance/sock
+    ...       transcript /dev/null
+    ...     </runner>
+    ...     <eventlog>
+    ...     </eventlog>
+    ...
+    ... [offline.conf]
+    ... location = %(zope3)s
+    ...
+    ... [offline]
+    ... recipe = zc.zope3recipes:offline
+    ... application = myapp
+    ... zope.conf = offline.conf
+    ...
+    ... [database]
+    ... recipe = zc.recipe.filestorage
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
+    Uninstalling myapp.
+    Uninstalling database.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
+    Installing instance.
+    Generated script '/sample-buildout/bin/server'.
+    Installing offline.
+
+    >>> cat('bin', 'offline')
+    #!/usr/local/bin/python2.4
+    <BLANKLINE>
+    import os
+    import sys
+    import logging
+    <BLANKLINE>
+    argv = list(sys.argv)
+    env = {}
+    restart = False
+    <BLANKLINE>
+    if None:
+        import pwd
+        if pwd.getpwnam(None).pw_uid != os.getuid():
+            restart = True
+            argv[:0] = ["sudo", "-u", None]
+            # print "switching to user", None
+        del pwd
+    <BLANKLINE>
+    for k in env:
+        if os.environ.get(k) != env[k]:
+            os.environ[k] = env[k]
+            restart = True
+        del k
+    <BLANKLINE>
+    if restart:
+        # print "restarting"
+        os.execvpe(argv[0], argv, dict(os.environ))
+    <BLANKLINE>
+    del argv
+    del env
+    del restart
+    <BLANKLINE>
+    sys.argv[1:1] = [
+        "-C",
+        '/zope3',
+    <BLANKLINE>
+        ]
+    <BLANKLINE>
+    debugzope = '/sample-buildout/parts/myapp/debugzope'
+    globals()["__file__"] = debugzope
+    <BLANKLINE>
+    zeo_logger = logging.getLogger('ZEO.zrpc')
+    zeo_logger.addHandler(logging.StreamHandler())
+    <BLANKLINE>
+    <BLANKLINE>
+    # print "starting debugzope..."
+    execfile(debugzope)
+
+The recipe also accepts an "initialization" option:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance offline
+    ...
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... name = server
+    ... application = myapp
+    ... zope.conf =
+    ...     <zodb>
+    ...       <zeoclient>
+    ...         server 127.0.0.1:8001
+    ...         server 127.0.0.1:8002
+    ...       </zeoclient>
+    ...     </zodb>
+    ... address = 8081
+    ... zdaemon.conf =
+    ...     <runner>
+    ...       daemon off
+    ...       socket-name /sample-buildout/parts/instance/sock
+    ...       transcript /dev/null
+    ...     </runner>
+    ...     <eventlog>
+    ...     </eventlog>
+    ...
+    ... [offline.conf]
+    ... location = %(zope3)s
+    ...
+    ... [offline]
+    ... recipe = zc.zope3recipes:offline
+    ... initialization =
+    ...     os.environ['ZC_DEBUG_LOGGING'] = 'on'
+    ... application = myapp
+    ... zope.conf = offline.conf
+    ...
+    ... [database]
+    ... recipe = zc.recipe.filestorage
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling offline.
+    Updating myapp.
+    Updating instance.
+    Installing offline.
+
+    >>> cat('bin', 'offline')
+    <BLANKLINE>
+    import os
+    import sys
+    import logging
+    <BLANKLINE>
+    argv = list(sys.argv)
+    env = {}
+    restart = False
+    <BLANKLINE>
+    if None:
+        import pwd
+        if pwd.getpwnam(None).pw_uid != os.getuid():
+            restart = True
+            argv[:0] = ["sudo", "-u", None]
+            # print "switching to user", None
+        del pwd
+    <BLANKLINE>
+    for k in env:
+        if os.environ.get(k) != env[k]:
+            os.environ[k] = env[k]
+            restart = True
+        del k
+    <BLANKLINE>
+    if restart:
+        # print "restarting"
+        os.execvpe(argv[0], argv, dict(os.environ))
+    <BLANKLINE>
+    del argv
+    del env
+    del restart
+    <BLANKLINE>
+    sys.argv[1:1] = [
+        "-C",
+        '/zope3',
+    <BLANKLINE>
+        ]
+    <BLANKLINE>
+    debugzope = '/sample-buildout/parts/myapp/debugzope'
+    globals()["__file__"] = debugzope
+    <BLANKLINE>
+    zeo_logger = logging.getLogger('ZEO.zrpc')
+    zeo_logger.addHandler(logging.StreamHandler())
+    <BLANKLINE>
+    os.environ['ZC_DEBUG_LOGGING'] = 'on'
+    <BLANKLINE>
+    # print "starting debugzope..."
+    execfile(debugzope)
