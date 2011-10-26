@@ -1,6 +1,6 @@
-=============
-Zope3 Recipes
-=============
+===============
+ Zope3 Recipes
+===============
 
 The Zope 3 recipes allow one to define Zope applications and instances
 of those applications.  A Zope application is a collection of software
@@ -2596,6 +2596,10 @@ a configuration file (that supports a "location" option) to exist.
     # print "starting debugzope..."
     execfile(debugzope)
 
+
+``initialization`` option
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The recipe also accepts an "initialization" option:
 
     >>> write('buildout.cfg',
@@ -2714,3 +2718,129 @@ The recipe also accepts an "initialization" option:
     <BLANKLINE>
     # print "starting debugzope..."
     execfile(debugzope)
+
+
+``script`` option
+~~~~~~~~~~~~~~~~~
+
+as well as a "script" option.
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance run-foo
+    ...
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:app
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... name = server
+    ... application = myapp
+    ... zope.conf =
+    ...     <zodb>
+    ...       <zeoclient>
+    ...         server 127.0.0.1:8001
+    ...         server 127.0.0.1:8002
+    ...       </zeoclient>
+    ...     </zodb>
+    ... address = 8081
+    ... zdaemon.conf =
+    ...     <runner>
+    ...       daemon off
+    ...       socket-name /sample-buildout/parts/instance/sock
+    ...       transcript /dev/null
+    ...     </runner>
+    ...     <eventlog>
+    ...     </eventlog>
+    ...
+    ... [offline.conf]
+    ... location = %(zope3)s
+    ...
+    ... [run-foo]
+    ... recipe = zc.zope3recipes:offline
+    ... initialization =
+    ...     os.environ['ZC_DEBUG_LOGGING'] = 'on'
+    ... application = myapp
+    ... zope.conf = offline.conf
+    ... script = %(zope3)s/foo.py
+    ...
+    ... [database]
+    ... recipe = zc.recipe.filestorage
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling offline.
+    Updating myapp.
+    Updating instance.
+    Installing run-foo.
+
+    >>> cat('bin', 'run-foo')
+    <BLANKLINE>
+    import os
+    import sys
+    import logging
+    <BLANKLINE>
+    argv = list(sys.argv)
+    env = {}
+    restart = False
+    <BLANKLINE>
+    if None:
+        import pwd
+        if pwd.getpwnam(None).pw_uid != os.getuid():
+            restart = True
+            argv[:0] = ["sudo", "-u", None]
+            # print "switching to user", None
+        del pwd
+    <BLANKLINE>
+    for k in env:
+        if os.environ.get(k) != env[k]:
+            os.environ[k] = env[k]
+            restart = True
+        del k
+    <BLANKLINE>
+    if restart:
+        # print "restarting"
+        os.execvpe(argv[0], argv, dict(os.environ))
+    <BLANKLINE>
+    del argv
+    del env
+    del restart
+    <BLANKLINE>
+    sys.argv[1:1] = [
+        "-C",
+        '/zope3',
+        '/zope3/foo.py'
+    <BLANKLINE>
+        ]
+    <BLANKLINE>
+    debugzope = '/sample-buildout/parts/myapp/debugzope'
+    globals()["__file__"] = debugzope
+    <BLANKLINE>
+    zeo_logger = logging.getLogger('ZEO.zrpc')
+    zeo_logger.addHandler(logging.StreamHandler())
+    <BLANKLINE>
+    os.environ['ZC_DEBUG_LOGGING'] = 'on'
+    <BLANKLINE>
+    # print "starting debugzope..."
+    execfile(debugzope)
+
