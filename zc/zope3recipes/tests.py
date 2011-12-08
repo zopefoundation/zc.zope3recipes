@@ -19,6 +19,21 @@ import zc.buildout.testing
 import unittest
 from zope.testing import doctest, renormalizing
 
+def ls_optional(dir, ignore=(), *subs):
+    if subs:
+        dir = os.path.join(dir, *subs)
+    names = os.listdir(dir)
+    names.sort()
+    for name in names:
+        if name in ignore:
+            continue
+        if os.path.isdir(os.path.join(dir, name)):
+            print 'd ',
+        elif os.path.islink(os.path.join(dir, name)):
+            print 'l ',
+        else:
+            print '- ',
+        print name
 
 def test_ctl():
     """

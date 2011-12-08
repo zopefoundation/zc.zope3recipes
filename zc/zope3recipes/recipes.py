@@ -16,6 +16,7 @@
 
 import os, sys, shutil
 import logging
+import pprint
 import zc.buildout
 import zc.recipe.egg
 import pkg_resources
@@ -501,3 +502,118 @@ ftesting_base = """
   <grant role="zope.Manager" principal="zope.globalmgr" />
 </configure>
 """
+
+
+class Offline(object):
+
+    def __init__(self, buildout, name, options):
+        self.name, self.options = name, options
+        deployment = options.get("deployment")
+        if deployment:
+            deployment = buildout[deployment]
+        if deployment is not None and "user" not in options:
+            options["user"] = deployment["user"]
+        if "directory" not in options:
+            if deployment is None:
+                directory = buildout["buildout"]["bin-directory"]
+            else:
+                directory = deployment["etc-directory"]
+            options["directory"] = directory
+        options["dest"] = os.path.join(directory, name)
+        env = options.get("environment")
+        if env:
+            self.environment = dict(buildout[env])
+        else:
+            self.environment = {}
+        app = buildout[options["application"]]
+        options["application-location"] = app["location"]
+        options["executable"] = app["executable"]
+        zope_conf = buildout[options["zope.conf"]]
+        options["zope.conf-location"] =  zope_conf["location"]
+        script = options.get("script")
+        if script:
+            script = os.path.join(buildout["buildout"]["directory"], script)
+            options["script"] = script
+
+    def update(self):
+        self.install()
+
+    def install(self):
+        options = self.options
+
+        debugzope = os.path.join(
+            options["application-location"], "debugzope")
+        config = options["zope.conf-location"]
+        script = options.get("script") or ""
+        if script:
+            script = repr(script)
+
+        initialization = options.get("initialization", "").strip()
+
+        script_content = template % dict(
+            config=config,
+            debugzope=debugzope,
+            executable=options["executable"],
+            environment=pprint.pformat(self.environment),
+            initialization=initialization,
+            script=script,
+            user=options.get("user"),
+            )
+
+        dest = options["dest"]
+        f = open(dest, "w")
+        f.write(script_content)
+        f.close()
+        os.chmod(dest, 0775)
+        return [dest]
+
+template = '''\
+#!%(executable)s
+
+import os
+import sys
+import logging
+
+argv = list(sys.argv)
+env = %(environment)s
+restart = False
+
+if %(user)r:
+    import pwd
+    if pwd.getpwnam(%(user)r).pw_uid != os.getuid():
+        restart = True
+        argv[:0] = ["sudo", "-u", %(user)r]
+        # print "switching to user", %(user)r
+    del pwd
+
+for k in env:
+    if os.environ.get(k) != env[k]:
+        os.environ[k] = env[k]
+        restart = True
+    del k
+
+if restart:
+    # print "restarting"
+    os.execvpe(argv[0], argv, dict(os.environ))
+
+del argv
+del env
+del restart
+
+sys.argv[1:1] = [
+    "-C",
+    %(config)r,
+    %(script)s
+    ]
+
+debugzope = %(debugzope)r
+globals()["__file__"] = debugzope
+
+zeo_logger = logging.getLogger('ZEO.zrpc')
+zeo_logger.addHandler(logging.StreamHandler())
+
+%(initialization)s
+
+# print "starting debugzope..."
+execfile(debugzope)
+'''

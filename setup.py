@@ -39,6 +39,7 @@ setup(
              'application = %s.recipes:Application' % name,
              'app = %s.recipes:App' % name,
              'instance = %s.recipes:Instance' % name,
+             'offline = %s.recipes:Offline' %name,
              ]
         },
     extras_require = dict(
