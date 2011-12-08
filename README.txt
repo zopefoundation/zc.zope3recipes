@@ -21,7 +21,7 @@ Releases
 ********
 
 ===================
-0.13.1 (unreleased)
+0.14.0 (2011/12/08)
 ===================
 
 - Execute $PYTHONSTARTUP in the environment that the user will interact
