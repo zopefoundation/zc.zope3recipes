@@ -2597,8 +2597,8 @@ a configuration file (that supports a "location" option) to exist.
     execfile(debugzope)
 
 
-``initialization`` option
-~~~~~~~~~~~~~~~~~~~~~~~~~
+initialization option
+---------------------
 
 The recipe also accepts an "initialization" option:
 
@@ -2720,8 +2720,8 @@ The recipe also accepts an "initialization" option:
     execfile(debugzope)
 
 
-``script`` option
-~~~~~~~~~~~~~~~~~
+script option
+-------------
 
 as well as a "script" option.
 
