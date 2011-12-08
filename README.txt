@@ -1,6 +1,6 @@
-**************************************
-Zope3 Application and Instance Recipes
-**************************************
+***********************************************
+Zope3 Application, Instance and Offline Recipes
+***********************************************
 
 Recipes for creating Zope 3 instances with distinguishing features:
 
@@ -9,6 +9,8 @@ Recipes for creating Zope 3 instances with distinguishing features:
 - Separates application and instance definition
 
 - Don't support package-includes
+
+- Support offline instance.
 
 Unfortunately, partial Windows support at this time. It works but it's alpha.
 
@@ -25,6 +27,8 @@ Releases
 - Execute $PYTHONSTARTUP in the environment that the user will interact
   with in zc.zope3recipes.debugzope; this mirrors how $PYTHONSTARTUP is
   used with an interactive interpreter.
+- Added a recipe for offline instance.
+- Fixed tests to pass with zc.buildout >= v1.5
 
 ===================
 0.13.0 (2010/11/24)
