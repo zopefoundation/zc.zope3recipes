@@ -41,7 +41,7 @@ setup(
              'instance = %s.recipes:Instance' % name,
              'offline = %s.recipes:Offline' % name,
              'zopeconf = %s.recipes:ZopeConf' % name,
-             ]
+             ],
         },
     extras_require = dict(
         tests = ['zdaemon', 'zc.recipe.filestorage'],
