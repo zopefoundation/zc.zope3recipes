@@ -12,7 +12,7 @@ Recipes for creating Zope 3 instances with distinguishing features:
 
 - Support offline instance.
 
-Unfortunately, partial Windows support at this time. It works but it's alpha.
+Unfortunately, partial Windows support at this time.  It works but it's alpha.
 
 .. contents::
 
@@ -21,10 +21,19 @@ Releases
 ********
 
 ===================
+0.15.0 (2011/12/12)
+===================
+
+- Added zopeconf recipe to produce decently-formatted zope.conf files,
+  without constructing an instance.
+
+
+===================
 0.14.1 (2011/12/08)
 ===================
 
 - Fixed ReST on pypi page.
+
 
 ===================
 0.14.0 (2011/12/08)
@@ -36,12 +45,14 @@ Releases
 - Added a recipe for offline instance.
 - Fixed tests to pass with zc.buildout >= v1.5
 
+
 ===================
 0.13.0 (2010/11/24)
 ===================
 
 - Support inserting additional code into the runzope & debugzope scripts
   using ``initialization`` and ``debug-initialization``.
+
 
 ===================
 0.12.0 (2010/11/22)
@@ -50,11 +61,13 @@ Releases
 - Provide control for generation of the logrotate configuration, include the
   ability to suppress it when not desired.
 
+
 ===================
 0.11.1 (2010/11/12)
 ===================
 
 - Added an environment hook to enable logging for debugzope
+
 
 ===================
 0.11.0 (2009/10/01)
@@ -64,6 +77,7 @@ Releases
 - Changed the dependency requirements to >=1.2.0 for zc.buildout and
   zc.recipe.egg because relative paths are added in these releases.
 - Added missing release date for the previous release (0.10.0).
+
 
 ===================
 0.10.0 (2009/09/16)
@@ -81,6 +95,7 @@ section to rotate logfiles internally.
 
 Updated tests to work with latest package versions.
 
+
 ==================
 0.8.0 (2009/04/03)
 ==================
@@ -88,6 +103,7 @@ Updated tests to work with latest package versions.
 Added the "newest=false" option in the SetUp to prevent upgrade during tests
 
 Added support for creating logrotate scripts when using a deployment recipe.
+
 
 ==================
 0.7.0 (2008/02/01)
@@ -99,11 +115,13 @@ Use the deployment name option (as provided by zc.recipe.deployment
 You can now specify an instance name option that overrides the part
 name for generated files.
 
+
 ==================
 0.6.1 (2007/12/17)
 ==================
 
 Fixed bug: The zope.conf site-definition option could not be overridden.
+
 
 ==================
 0.6.0 (2007/11/03)
@@ -111,17 +129,20 @@ Fixed bug: The zope.conf site-definition option could not be overridden.
 
 Final release with Windows support.
 
+
 ==================
 0.6b1 (2007/08/21)
 ==================
 
 Windows support was added.
 
+
 ==================
 0.5.5 (2007/07/26)
 ==================
 
 Now debugzope takes the servers key of the application into account.
+
 
 ==================
 0.5.3 (2007/07/14)
@@ -131,6 +152,7 @@ Created another recipe called 'application' that installs Zope 3
 solely from eggs.  The 'app' recipe is just an extension that also
 supports Zope 3 from checkout or tarball.
 
+
 ==================
 0.5.2 (2007/06/21)
 ==================
@@ -138,11 +160,13 @@ supports Zope 3 from checkout or tarball.
 Use ZConfig's schema-free configuration parsing gain support for
 %import.
 
+
 ==================
 0.5.1 (2007/05/22)
 ==================
 
 Support repeated keys in ZConfig sections.
+
 
 ==================
 0.5.0 (2007/03/21)
