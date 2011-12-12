@@ -2466,6 +2466,193 @@ in a buildout configuration.
             )
 
 
+zope.conf recipe
+================
+
+The zope.conf recipe handles filling in the implied bits of a zope.conf
+file that the instance recipe performs, without creating the rest of an
+instance.
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1
+    ... parts = some.conf
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:application
+    ... site.zcml = <include package="demo1" />
+    ... eggs = demo1
+    ...
+    ... [some.conf]
+    ... recipe = zc.zope3recipes:zopeconf
+    ... application = myapp
+    ... text =
+    ...     <zodb>
+    ...       <zeoclient>
+    ...         server 127.0.0.1:8001
+    ...       </zeoclient>
+    ...     </zodb>
+    ...
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Uninstalling instance.
+    Uninstalling myapp.
+    Uninstalling database.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
+    Installing some.conf.
+
+    >>> cat('parts', 'some.conf')
+    site-definition /sample-buildout/parts/myapp/site.zcml
+    <BLANKLINE>
+    <zodb>
+      <zeoclient>
+        server 127.0.0.1:8001
+      </zeoclient>
+    </zodb>
+    <BLANKLINE>
+    <server>
+      address 8080
+      type HTTP
+    </server>
+    <BLANKLINE>
+    <accesslog>
+      <logfile>
+        path /sample-buildout/parts/some-access.log
+      </logfile>
+    </accesslog>
+    <BLANKLINE>
+    <eventlog>
+      <logfile>
+        formatter zope.exceptions.log.Formatter
+        path STDOUT
+      </logfile>
+    </eventlog>
+
+We can specify the location of the access log directly in the part:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1
+    ... parts = some.conf
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:application
+    ... site.zcml = <include package="demo1" />
+    ... eggs = demo1
+    ...
+    ... [some.conf]
+    ... recipe = zc.zope3recipes:zopeconf
+    ... application = myapp
+    ... access-log = ${buildout:directory}/access.log
+    ... text =
+    ...     <zodb>
+    ...       <zeoclient>
+    ...         server 127.0.0.1:8001
+    ...       </zeoclient>
+    ...     </zodb>
+    ...
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/tmp/tmp2eRRw1buildoutSetUp/_TEST_/sample-buildout/demo1'
+    Uninstalling some.conf.
+    Updating myapp.
+    Installing some.conf.
+
+    >>> cat('parts', 'some.conf')
+    site-definition /sample-buildout/parts/myapp/site.zcml
+    <BLANKLINE>
+    <zodb>
+      <zeoclient>
+        server 127.0.0.1:8001
+      </zeoclient>
+    </zodb>
+    <BLANKLINE>
+    <server>
+      address 8080
+      type HTTP
+    </server>
+    <BLANKLINE>
+    <accesslog>
+      <logfile>
+        path /sample-buildout/access.log
+      </logfile>
+    </accesslog>
+    <BLANKLINE>
+    <eventlog>
+      <logfile>
+        formatter zope.exceptions.log.Formatter
+        path STDOUT
+      </logfile>
+    </eventlog>
+
+The address of the server can be set using the "address" setting:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1
+    ... parts = some.conf
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:application
+    ... site.zcml = <include package="demo1" />
+    ... eggs = demo1
+    ...
+    ... [some.conf]
+    ... recipe = zc.zope3recipes:zopeconf
+    ... address = 4242
+    ... application = myapp
+    ... text =
+    ...     <zodb>
+    ...       <zeoclient>
+    ...         server 127.0.0.1:8001
+    ...       </zeoclient>
+    ...     </zodb>
+    ...
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/tmp/tmp2eRRw1buildoutSetUp/_TEST_/sample-buildout/demo1'
+    Uninstalling some.conf.
+    Updating myapp.
+    Installing some.conf.
+
+    >>> cat('parts', 'some.conf')
+    site-definition /sample-buildout/parts/myapp/site.zcml
+    <BLANKLINE>
+    <zodb>
+      <zeoclient>
+        server 127.0.0.1:8001
+      </zeoclient>
+    </zodb>
+    <BLANKLINE>
+    <server>
+      address 4242
+      type HTTP
+    </server>
+    <BLANKLINE>
+    <accesslog>
+      <logfile>
+        path /sample-buildout/parts/some-access.log
+      </logfile>
+    </accesslog>
+    <BLANKLINE>
+    <eventlog>
+      <logfile>
+        formatter zope.exceptions.log.Formatter
+        path STDOUT
+      </logfile>
+    </eventlog>
+
+
+
 Offline recipe
 ==============
 
@@ -2537,9 +2724,8 @@ a configuration file (that supports a "location" option) to exist.
     >>> print system(join('bin', 'buildout')),
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
-    Uninstalling instance.
+    Uninstalling some.conf.
     Uninstalling myapp.
-    Uninstalling database.
     Installing myapp.
     Generated script '/sample-buildout/parts/myapp/runzope'.
     Generated script '/sample-buildout/parts/myapp/debugzope'.

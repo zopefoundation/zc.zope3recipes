@@ -36,6 +36,7 @@ WIN = False
 if sys.platform[:3].lower() == "win":
     WIN = True
 
+
 class Application(object):
 
     def __init__(self, buildout, name, options):
@@ -504,39 +505,130 @@ ftesting_base = """
 """
 
 
-class Offline(object):
+class SupportingBase(object):
 
     def __init__(self, buildout, name, options):
-        self.name, self.options = name, options
+        self.options = options
+        self.name = name
         deployment = options.get("deployment")
         if deployment:
             deployment = buildout[deployment]
-        if deployment is not None and "user" not in options:
-            options["user"] = deployment["user"]
+        self.deployment = deployment
+        self.app = buildout[options["application"]]
+        options["application-location"] = self.app["location"]
+
+    def update(self):
+        self.install()
+
+
+class ZopeConf(SupportingBase):
+
+    def __init__(self, buildout, name, options):
+        super(ZopeConf, self).__init__(buildout, name, options)
+        if self.deployment:
+            options['run-directory'] = self.deployment['run-directory']
+        else:
+            options['run-directory'] = os.path.join(
+                buildout['buildout']['parts-directory'])
+
+    def install(self):
+        options = self.options
+        run_directory = options['run-directory']
+
+        zope_conf = options.get('text', '')+'\n'
+        zope_conf = ZConfig.schemaless.loadConfigFile(
+            cStringIO.StringIO(zope_conf))
+
+        if "access-log" in options:
+            access_log_name = options["access-log"]
+            access_log_specified = True
+        else:
+            basename = os.path.splitext(self.name)[0]
+            access_log_name = basename+'-access.log'
+            access_log_specified = False
+
+        # access_log_path depends on whether a given name is an absolute
+        # path; this (and the windows case) are handled specially so the
+        # file can be dumped to /dev/null for offline scripts.
+        if (os.path.isabs(access_log_name)
+            or (WIN and access_log_name.upper() == "NUL")):
+            access_log_path = access_log_name
+        elif self.deployment:
+            access_log_path = os.path.join(
+                self.deployment['log-directory'], access_log_name)
+        else:
+            access_log_path = os.path.join(run_directory, access_log_name)
+
+        if self.deployment:
+            zope_conf_path = os.path.join(
+                self.deployment['etc-directory'], self.name)
+        else:
+            zope_conf_path = os.path.join(run_directory, self.name)
+
+        if 'site-definition' not in zope_conf:
+            app_loc = options["application-location"]
+            zope_conf['site-definition'] = [
+                os.path.join(app_loc, 'site.zcml')
+                ]
+
+        server_type = server_types[self.app['servers']][1]
+        for address in options.get('address', '').split():
+            zope_conf.sections.append(
+                ZConfig.schemaless.Section(
+                    'server',
+                    data=dict(type=[server_type], address=[address]))
+                )
+        if not [s for s in zope_conf.sections
+                if ('server' in s.type)]:
+            zope_conf.sections.append(
+                ZConfig.schemaless.Section(
+                    'server',
+                    data=dict(type=[server_type], address=['8080']))
+                )
+
+        if not [s for s in zope_conf.sections if s.type == 'zodb']:
+            raise zc.buildout.UserError(
+                'No database sections have been defined.')
+
+        if not [s for s in zope_conf.sections if s.type == 'accesslog']:
+            zope_conf.sections.append(access_log(access_log_path))
+        elif access_log_specified:
+            # Can't include one and specify the path.
+            raise zc.buildout.UserError(
+                "access log can only be specified once")
+
+        if not [s for s in zope_conf.sections if s.type == 'eventlog']:
+            zope_conf.sections.append(event_log('STDOUT'))
+
+        open(zope_conf_path, 'w').write(str(zope_conf))
+        return [zope_conf_path]
+
+
+class Offline(SupportingBase):
+
+    def __init__(self, buildout, name, options):
+        super(Offline, self).__init__(buildout, name, options)
         if "directory" not in options:
-            if deployment is None:
+            if self.deployment is None:
                 directory = buildout["buildout"]["bin-directory"]
             else:
-                directory = deployment["etc-directory"]
+                directory = self.deployment["etc-directory"]
             options["directory"] = directory
-        options["dest"] = os.path.join(directory, name)
+        if self.deployment is not None and "user" not in options:
+            options["user"] = self.deployment["user"]
+        options["dest"] = os.path.join(options["directory"], name)
         env = options.get("environment")
         if env:
             self.environment = dict(buildout[env])
         else:
             self.environment = {}
-        app = buildout[options["application"]]
-        options["application-location"] = app["location"]
-        options["executable"] = app["executable"]
+        options["executable"] = self.app["executable"]
         zope_conf = buildout[options["zope.conf"]]
         options["zope.conf-location"] =  zope_conf["location"]
         script = options.get("script")
         if script:
             script = os.path.join(buildout["buildout"]["directory"], script)
             options["script"] = script
-
-    def update(self):
-        self.install()
 
     def install(self):
         options = self.options

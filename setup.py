@@ -39,7 +39,8 @@ setup(
              'application = %s.recipes:Application' % name,
              'app = %s.recipes:App' % name,
              'instance = %s.recipes:Instance' % name,
-             'offline = %s.recipes:Offline' %name,
+             'offline = %s.recipes:Offline' % name,
+             'zopeconf = %s.recipes:ZopeConf' % name,
              ]
         },
     extras_require = dict(
