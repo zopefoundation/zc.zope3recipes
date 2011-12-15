@@ -1880,7 +1880,7 @@ rc-directory
 logrotate-directory
     The name ot the directory where logrotate configuration files should be
     installed.
-    
+
 user
     The name of a user that processes should run as.
 
@@ -2041,7 +2041,7 @@ locations:
         /root/etc/init.d/myapp-run-instance reopen_transcript
       endscript
     }
-    
+
 
 If we provide an alternate instance name, that will be reflected in
 the generated files:
@@ -3029,4 +3029,3 @@ as well as a "script" option.
     <BLANKLINE>
     # print "starting debugzope..."
     execfile(debugzope)
-
