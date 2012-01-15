@@ -21,6 +21,13 @@ Releases
 ********
 
 ===================
+0.16.0 (2012/01/15)
+===================
+
+- Added support for using Paste Deployment to specify a WSGI stack
+  over a zope.app-based application,
+
+===================
 0.15.0 (2011/12/12)
 ===================
 

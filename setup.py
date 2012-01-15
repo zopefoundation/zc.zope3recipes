@@ -1,13 +1,27 @@
+##############################################################################
+#
+# Copyright Zope Foundation and Contributors.
+# All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+name, version = "zc.zope3recipes", "0"
+
 import os
 from setuptools import setup, find_packages
 
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-name = "zc.zope3recipes"
 setup(
     name = name,
-    version = '0',
+    version = version,
     author = "Jim Fulton",
     author_email = "jim@zope.com",
     description = "ZC Buildout recipe for defining Zope 3 applications",
@@ -44,7 +58,7 @@ setup(
              ],
         },
     extras_require = dict(
-        tests = ['zdaemon', 'zc.recipe.filestorage'],
+        tests = ['zdaemon', 'zc.recipe.filestorage', 'PasteScript'],
         ),
     classifiers=[
         "Development Status :: 5 - Production/Stable",

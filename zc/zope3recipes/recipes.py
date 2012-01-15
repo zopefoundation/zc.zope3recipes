@@ -14,14 +14,17 @@
 """Collected Zope 3 recipes
 """
 
-import os, sys, shutil
-import logging
-import pprint
-import zc.buildout
-import zc.recipe.egg
-import pkg_resources
-import ZConfig.schemaless
 import cStringIO
+import logging
+import os
+import pkg_resources
+import pprint
+import re
+import shutil
+import sys
+import zc.buildout
+import ZConfig.schemaless
+import zc.recipe.egg
 
 this_loc = pkg_resources.working_set.find(
     pkg_resources.Requirement.parse('zc.zope3recipes')).location
@@ -30,6 +33,7 @@ server_types = {
     # name     (module,                  http-name)
     'twisted': ('zope.app.twisted.main', 'HTTP'),
     'zserver': ('zope.app.server.main',  'WSGI-HTTP'),
+    'paste': ('zope.app.server.main',  ''),
     }
 
 WIN = False
@@ -51,7 +55,11 @@ class Application(object):
         options['servers'] = options.get('servers', 'twisted')
         if options['servers'] not in server_types:
             raise ValueError(
-                'servers setting must be one of "twisted" or "zserver"')
+                'servers setting must be one of %s' %
+                repr(sorted(server_types))[1:-1]
+                )
+        if options['servers'] == 'paste':
+            options['eggs'] += '\n  PasteScript\n'
 
         options['scripts'] = ''
         self.egg = zc.recipe.egg.Egg(buildout, name, options)
@@ -74,14 +82,27 @@ class Application(object):
             self.egg.install()
             requirements, ws = self.egg.working_set()
 
-            # install subprograms and ctl scripts
             server_module = server_types[options['servers']][0]
+
+            # install subprograms and ctl scripts
+            if options['servers'] == 'paste':
+                reqs = ['PasteScript']
+                scripts = dict(paster='runzope')
+                arguments = "['serve']+sys.argv[1:]"
+            else:
+                reqs = [('runzope', server_module, 'main')]
+                scripts = None
+                arguments = ''
+
             extra_paths = options.get('extra-paths', '')
             initialization = options.get('initialization') or ''
+
             zc.buildout.easy_install.scripts(
-                [('runzope', server_module, 'main')],
+                reqs,
                 ws, options['executable'], dest,
+                scripts=scripts,
                 extra_paths=extra_paths.split(),
+                arguments=arguments,
                 initialization=initialization,
                 relative_paths=self.egg._relative_paths,
                 )
@@ -222,6 +243,8 @@ class Instance:
                                           self.name+'-zope.conf')
             zdaemon_conf_path = os.path.join(options['etc-directory'],
                                              self.name+'-zdaemon.conf')
+            paste_ini_path = os.path.join(options['etc-directory'],
+                                             self.name+'-paste.ini')
             event_log_path = os.path.join(options['log-directory'],
                                           self.name+'-z3.log')
             access_log_path = os.path.join(options['log-directory'],
@@ -250,6 +273,7 @@ class Instance:
         else:
             zope_conf_path = os.path.join(run_directory, 'zope.conf')
             zdaemon_conf_path = os.path.join(run_directory, 'zdaemon.conf')
+            paste_ini_path = os.path.join(run_directory, 'paste.ini')
             event_log_path = os.path.join(run_directory, 'z3.log')
             access_log_path = os.path.join(run_directory, 'access.log')
             socket_path = os.path.join(run_directory, 'zdaemon.sock')
@@ -272,20 +296,75 @@ class Instance:
                     os.path.join(app_loc, 'site.zcml')
                     ]
 
+            threads = None
             server_type = server_types[options['servers']][1]
-            for address in options.get('address', '').split():
-                zope_conf.sections.append(
-                    ZConfig.schemaless.Section(
-                        'server',
-                        data=dict(type=[server_type], address=[address]))
-                    )
-            if not [s for s in zope_conf.sections
-                    if ('server' in s.type)]:
-                zope_conf.sections.append(
-                    ZConfig.schemaless.Section(
-                        'server',
-                        data=dict(type=[server_type], address=['8080']))
-                    )
+            if server_type:
+                for address in options.get('address', '').split():
+                    zope_conf.sections.append(
+                        ZConfig.schemaless.Section(
+                            'server',
+                            data=dict(type=[server_type], address=[address]))
+                        )
+                if not [s for s in zope_conf.sections
+                        if ('server' in s.type)]:
+                    zope_conf.sections.append(
+                        ZConfig.schemaless.Section(
+                            'server',
+                            data=dict(type=[server_type], address=['8080']))
+                        )
+                program_args = '-C '+zope_conf_path
+            else: # paste
+                paste_ini = options.get('paste.ini', '')
+                if not paste_ini:
+                    address = options.get('address', '8080').split()
+                    if not len(address) == 1:
+                        raise zc.buildout.UserError(
+                            "If you don't specify a paste.ini option, "
+                            "you must specify exactly one address.")
+                    [address] = address
+                    if ':' in address:
+                        host, port = address.rsplit(':', 1)
+                        port = int(port)
+                    elif re.match('\d+$', address):
+                        host = ''
+                        port = int(address)
+                    else:
+                        host = address
+                        port = 8080
+
+                    threads = zope_conf.pop('threads', None)
+                    threads = threads and threads[0] or 4
+
+                    paste_ini = (
+                        "filter-with = translogger\n"
+                        "\n"
+                        "[filter:translogger]\n"
+                        "use = egg:Paste#translogger\n"
+                        "setup_console_handler = False\n"
+                        "logger_name = accesslog\n"
+                        "\n"
+                        ""
+                        "[server:main]\n"
+                        "use = egg:zope.server\n"
+                        "host = %s\n"
+                        "port = %s\n"
+                        "threads = %s\n"
+                        % (host, port, threads)
+                        )
+
+                paste_ini = (
+                    "[app:main]\n"
+                    "use = egg:zope.app.wsgi\n"
+                    "config_file = %s\n"
+                    % zope_conf_path) + paste_ini
+
+                creating.append(paste_ini_path)
+                f = open(paste_ini_path, 'w')
+                f.write(paste_ini)
+                f.close()
+
+                program_args = paste_ini_path
+
 
             if not [s for s in zope_conf.sections if s.type == 'zodb']:
                 raise zc.buildout.UserError(
@@ -293,6 +372,18 @@ class Instance:
 
             if not [s for s in zope_conf.sections if s.type == 'accesslog']:
                 zope_conf.sections.append(access_log(access_log_path))
+
+            if not server_type: # paste
+                for s in zope_conf.sections:
+                    if s.type != 'accesslog':
+                        continue
+                    s.type = 'logger'
+                    s.name = 'accesslog'
+                    s['name'] = [s.name]
+                    s['level'] = ['info']
+                    s['propagate'] = ['false']
+                    for formatter in s.sections:
+                        formatter['format'] = ['%(message)s']
 
             if not [s for s in zope_conf.sections if s.type == 'eventlog']:
                 zope_conf.sections.append(event_log('STDOUT'))
@@ -303,9 +394,8 @@ class Instance:
                 cStringIO.StringIO(zdaemon_conf))
 
             defaults = {
-                'program': "%s -C %s" % (os.path.join(app_loc, 'runzope'),
-                                         zope_conf_path,
-                                         ),
+                'program': "%s %s" % (os.path.join(app_loc, 'runzope'),
+                                      program_args),
                 'daemon': 'on',
                 'transcript': event_log_path,
                 'socket-name': socket_path,
@@ -436,10 +526,7 @@ def event_log2(path, *data):
     return ZConfig.schemaless.Section(
         'eventlog', '', None,
         [ZConfig.schemaless.Section(
-             'logfile',
-             '',
-             dict(path=[path])),
-         ])
+            'logfile', '', dict(path=[path]))])
 
 
 logrotate_template = """%(logfile)s {

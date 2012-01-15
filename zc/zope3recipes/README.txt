@@ -3029,3 +3029,219 @@ as well as a "script" option.
     <BLANKLINE>
     # print "starting debugzope..."
     execfile(debugzope)
+
+Paste-deployment support
+========================
+
+You can use paste-deployment to control WSGI servers and middleware.
+You indicate this by specifying ``paste`` in the ``servers`` option:
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance
+    ...
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:application
+    ... servers = paste
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... application = myapp
+    ... zope.conf =
+    ...    threads 1
+    ...    ${database:zconfig}
+    ...
+    ...
+    ... [database]
+    ... recipe = zc.recipe.filestorage
+    ... ''' % globals())
+
+When we run the buildout, we'll get a paste-based runzope script and
+paste-based instance start scripts.
+
+.. test
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling run-foo.
+    Uninstalling instance.
+    Uninstalling myapp.
+    Installing database.
+    Installing myapp.
+    Generated script '/sample-buildout/parts/myapp/runzope'.
+    Generated script '/sample-buildout/parts/myapp/debugzope'.
+    Installing instance.
+    Generated script '/sample-buildout/bin/instance'.
+
+
+    >>> cat('parts', 'myapp', 'runzope')
+    #!/usr/local/python/2.6/bin/python2.6
+    <BLANKLINE>
+    import sys
+    sys.path[0:0] = [
+        '/sample-buildout/demo2',
+        '/sample-buildout/eggs/PasteScript-1.7.4.2-py2.6.egg',
+        '/sample-buildout/eggs/setuptools-0.6c12dev_r88846-py2.6.egg',
+        '/sample-buildout/eggs/PasteDeploy-1.5.0-py2.6.egg',
+        '/sample-buildout/eggs/Paste-1.7.5.1-py2.6.egg',
+        '/sample-buildout/demo1',
+        ]
+    <BLANKLINE>
+    <BLANKLINE>
+    import paste.script.command
+    <BLANKLINE>
+    if __name__ == '__main__':
+        paste.script.command.run(['serve']+sys.argv[1:])
+
+
+    >>> cat('parts', 'instance', 'zope.conf')
+    site-definition /sample-buildout/parts/myapp/site.zcml
+    <BLANKLINE>
+    <zodb>
+      <filestorage>
+        path /sample-buildout/parts/database/Data.fs
+      </filestorage>
+    </zodb>
+    <BLANKLINE>
+    <logger accesslog>
+      level info
+      name accesslog
+      propagate false
+    <BLANKLINE>
+      <logfile>
+        format %(message)s
+        path /sample-buildout/parts/instance/access.log
+      </logfile>
+    </logger>
+    <BLANKLINE>
+    <eventlog>
+      <logfile>
+        formatter zope.exceptions.log.Formatter
+        path STDOUT
+      </logfile>
+    </eventlog>
+
+    >>> cat('parts', 'instance', 'zdaemon.conf')
+    <runner>
+      daemon on
+      directory /sample-buildout/parts/instance
+      program /sample-buildout/parts/myapp/runzope /sample-buildout/parts/instance/paste.ini
+      socket-name /sample-buildout/parts/instance/zdaemon.sock
+      transcript /sample-buildout/parts/instance/z3.log
+    </runner>
+    <BLANKLINE>
+    <eventlog>
+      <logfile>
+        path /sample-buildout/parts/instance/z3.log
+      </logfile>
+    </eventlog>
+
+We also get a paste.ini file in the instance directory, which defines
+the application and server and is used when running paste::
+
+    >>> cat('parts', 'instance', 'paste.ini')
+    [app:main]
+    use = egg:zope.app.wsgi
+    config_file = /sample-buildout/parts/instance/zope.conf
+    filter-with = translogger
+    <BLANKLINE>
+    [filter:translogger]
+    use = egg:Paste#translogger
+    setup_console_handler = False
+    logger_name = accesslog
+    <BLANKLINE>
+    [server:main]
+    use = egg:zope.server
+    host = 
+    port = 8080
+    threads = 1
+
+Note that the threads setting made in zope.conf was moved to paste.ini
+
+Note too that past:translogger was used to provide an access log.
+
+If you don't want to use zope.server, or if you want to control the
+server configuration yourself, you can provide a paste.init option::
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1 demo2
+    ... parts = instance
+    ...
+    ... [zope3]
+    ... location = %(zope3)s
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:application
+    ... servers = paste
+    ... site.zcml = <include package="demo2" />
+    ...             <principal
+    ...                 id="zope.manager"
+    ...                 title="Manager"
+    ...                 login="jim"
+    ...                 password_manager="SHA1"
+    ...                 password="40bd001563085fc35165329ea1ff5c5ecbdbbeef"
+    ...                 />
+    ...             <grant
+    ...                 role="zope.Manager"
+    ...                 principal="zope.manager"
+    ...                 />
+    ... eggs = demo2
+    ...
+    ... [instance]
+    ... recipe = zc.zope3recipes:instance
+    ... application = myapp
+    ... zope.conf =
+    ...    threads 1
+    ...    ${database:zconfig}
+    ... paste.ini = test and not working :)
+    ...
+    ...
+    ... [database]
+    ... recipe = zc.recipe.filestorage
+    ... ''' % globals())
+
+.. test
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/sample-buildout/demo1'
+    Develop: '/sample-buildout/demo2'
+    Uninstalling instance.
+    Updating database.
+    Updating myapp.
+    Installing instance.
+    Generated script '/sample-buildout/bin/instance'.
+
+In this example, we gave useless text in the paste.ini option and we
+got a nonsense paste.ini file::
+
+    >>> cat('parts', 'instance', 'paste.ini')
+    [app:main]
+    use = egg:zope.app.wsgi
+    config_file = /sample-buildout/parts/instance/zope.conf
+    <BLANKLINE>
+    test and not working :)
+
+This illustrates that the recipe doesn't care what you provide.  It
+uses it with the application definition instead of supplying
+zope.server and paste.translogger definition.
