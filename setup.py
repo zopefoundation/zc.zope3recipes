@@ -11,7 +11,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-name, version = "zc.zope3recipes", "0"
+name, version = "zc.zope3recipes", "0.17.0"
 
 import os
 from setuptools import setup, find_packages
