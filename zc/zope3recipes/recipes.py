@@ -614,9 +614,14 @@ class ZopeConf(SupportingBase):
         super(ZopeConf, self).__init__(buildout, name, options)
         if self.deployment:
             options['run-directory'] = self.deployment['run-directory']
+            zope_conf_path = os.path.join(
+                self.deployment['etc-directory'], self.name)
         else:
-            options['run-directory'] = os.path.join(
+            directory = os.path.join(
                 buildout['buildout']['parts-directory'])
+            options['run-directory'] = directory
+            zope_conf_path = os.path.join(directory, self.name)
+        options["location"] = zope_conf_path
 
     def install(self):
         options = self.options
@@ -646,11 +651,7 @@ class ZopeConf(SupportingBase):
         else:
             access_log_path = os.path.join(run_directory, access_log_name)
 
-        if self.deployment:
-            zope_conf_path = os.path.join(
-                self.deployment['etc-directory'], self.name)
-        else:
-            zope_conf_path = os.path.join(run_directory, self.name)
+        zope_conf_path = options["location"]
 
         if 'site-definition' not in zope_conf:
             app_loc = options["application-location"]

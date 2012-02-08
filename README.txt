@@ -21,6 +21,14 @@ Releases
 ********
 
 ===================
+0.17.0 (2012/02/07)
+===================
+
+- Added "location" value as output of the zopeconf recipe to make it
+  easier to use in place of ``zc.recipe.deployment:configuration``.
+
+
+===================
 0.16.0 (2012/01/15)
 ===================
 

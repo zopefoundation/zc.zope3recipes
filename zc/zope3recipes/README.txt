@@ -2651,6 +2651,57 @@ The address of the server can be set using the "address" setting:
       </logfile>
     </eventlog>
 
+The location of the file is made available as the "location" setting.
+This parallels the zc.recipe.deployment:configuration recipe, making
+this a possible replacement for that recipe where appropriate.
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... develop = demo1
+    ... parts = another.conf
+    ...
+    ... [myapp]
+    ... recipe = zc.zope3recipes:application
+    ... site.zcml = <include package="demo1" />
+    ... eggs = demo1
+    ...
+    ... [some.conf]
+    ... recipe = zc.zope3recipes:zopeconf
+    ... application = myapp
+    ... text =
+    ...     <zodb>
+    ...       <zeoclient>
+    ...         server 127.0.0.1:8001
+    ...       </zeoclient>
+    ...     </zodb>
+    ...
+    ... [another.conf]
+    ... recipe = zc.zope3recipes:zopeconf
+    ... application = myapp
+    ... text =
+    ...     ${some.conf:text}
+    ...     <product-config reference>
+    ...       config ${some.conf:location}
+    ...     </product-config>
+    ...
+    ... ''' % globals())
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/tmp/tmp2eRRw1buildoutSetUp/_TEST_/sample-buildout/demo1'
+    Uninstalling some.conf.
+    Updating myapp.
+    Installing some.conf.
+    Installing another.conf.
+
+    >>> cat('parts', 'another.conf')
+    site-definition /sample-buildout/parts/myapp/site.zcml
+    ...
+    <product-config reference>
+      config /sample-buildout/parts/some.conf
+    </product-config>
+    ...
+
 
 
 Offline recipe
@@ -2724,6 +2775,7 @@ a configuration file (that supports a "location" option) to exist.
     >>> print system(join('bin', 'buildout')),
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
+    Uninstalling another.conf.
     Uninstalling some.conf.
     Uninstalling myapp.
     Installing myapp.
