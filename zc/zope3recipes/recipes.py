@@ -765,7 +765,7 @@ restart = False
 
 if %(user)r:
     import pwd
-    if pwd.getpwnam(%(user)r).pw_uid != os.getuid():
+    if pwd.getpwnam(%(user)r).pw_uid != os.geteuid():
         restart = True
         argv[:0] = ["sudo", "-u", %(user)r]
         # print "switching to user", %(user)r

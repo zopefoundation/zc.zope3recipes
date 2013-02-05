@@ -21,6 +21,13 @@ Releases
 ********
 
 ===================
+0.18.0 (2013/02/05)
+===================
+
+- For the offline recipe, check the effective UID instead of the actual UID.
+
+
+===================
 0.17.0 (2012/02/07)
 ===================
 

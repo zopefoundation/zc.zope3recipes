@@ -2797,7 +2797,7 @@ a configuration file (that supports a "location" option) to exist.
     <BLANKLINE>
     if None:
         import pwd
-        if pwd.getpwnam(None).pw_uid != os.getuid():
+        if pwd.getpwnam(None).pw_uid != os.geteuid():
             restart = True
             argv[:0] = ["sudo", "-u", None]
             # print "switching to user", None
@@ -2919,7 +2919,7 @@ The recipe also accepts an "initialization" option:
     <BLANKLINE>
     if None:
         import pwd
-        if pwd.getpwnam(None).pw_uid != os.getuid():
+        if pwd.getpwnam(None).pw_uid != os.geteuid():
             restart = True
             argv[:0] = ["sudo", "-u", None]
             # print "switching to user", None
@@ -3043,7 +3043,7 @@ as well as a "script" option.
     <BLANKLINE>
     if None:
         import pwd
-        if pwd.getpwnam(None).pw_uid != os.getuid():
+        if pwd.getpwnam(None).pw_uid != os.geteuid():
             restart = True
             argv[:0] = ["sudo", "-u", None]
             # print "switching to user", None
