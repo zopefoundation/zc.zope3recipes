@@ -25,6 +25,7 @@ Releases
 ===================
 
 - For the offline recipe, check the effective UID instead of the actual UID.
+- Make the tests pass with modern buildouts, including buildout 2.
 
 
 ===================
