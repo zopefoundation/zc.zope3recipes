@@ -242,6 +242,10 @@ checker = renormalizing.RENormalizing([
     (re.compile('-\S+-py\d[.]\d(-\S+)?.egg'),
      '-pyN.N.egg',
     ),
+    # Turn "distribute" into "setuptools" so the tests can pass with either:
+    (re.compile(r'\bdistribute-pyN\.N\.egg'),
+     'setuptools-pyN.N.egg',
+    ),
     ])
 
 

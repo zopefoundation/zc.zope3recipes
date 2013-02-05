@@ -41,6 +41,11 @@ if sys.platform[:3].lower() == "win":
     WIN = True
 
 
+def get_executable(section):
+    # Support older multi-python buildouts, and newer mono-python buildouts.
+    return section.get("executable") or sys.executable
+
+
 class Application(object):
 
     def __init__(self, buildout, name, options):
@@ -99,7 +104,7 @@ class Application(object):
 
             zc.buildout.easy_install.scripts(
                 reqs,
-                ws, options['executable'], dest,
+                ws, get_executable(options), dest,
                 scripts=scripts,
                 extra_paths=extra_paths.split(),
                 arguments=arguments,
@@ -120,7 +125,7 @@ class Application(object):
             arguments = 'main_module=%s' % server_module
             zc.buildout.easy_install.scripts(
                 [('debugzope', 'zc.zope3recipes.debugzope', 'debug')],
-                ws, options['executable'], dest,
+                ws, get_executable(options), dest,
                 extra_paths = options['extra-paths'].split(),
                 initialization = initialization,
                 arguments = arguments,
@@ -480,7 +485,7 @@ class Instance:
             if WIN:
                 zc.buildout.easy_install.scripts(
                     [(rc, 'zc.zope3recipes.winctl', 'main')],
-                    ws, options['executable'], options['bin-directory'],
+                    ws, get_executable(options), options['bin-directory'],
                     extra_paths=[this_loc],
                     arguments=arguments,
                     relative_paths=self.egg._relative_paths,
@@ -488,7 +493,7 @@ class Instance:
             else:
                 zc.buildout.easy_install.scripts(
                     [(rc, 'zc.zope3recipes.ctl', 'main')],
-                    ws, options['executable'], options['bin-directory'],
+                    ws, get_executable(options), options['bin-directory'],
                     extra_paths=[this_loc],
                     arguments=arguments,
                     relative_paths=self.egg._relative_paths,
@@ -710,7 +715,7 @@ class Offline(SupportingBase):
             self.environment = dict(buildout[env])
         else:
             self.environment = {}
-        options["executable"] = self.app["executable"]
+        options["executable"] = get_executable(self.app)
         zope_conf = buildout[options["zope.conf"]]
         options["zope.conf-location"] =  zope_conf["location"]
         script = options.get("script")

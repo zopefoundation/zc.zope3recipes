@@ -97,7 +97,7 @@ The runzope script runs the Web server:
     import zope.app.twisted.main
     <BLANKLINE>
     if __name__ == '__main__':
-        zope.app.twisted.main.main()
+        sys.exit(zope.app.twisted.main.main())
 
 Here, unlike the above example the location path is not included
 in ``sys.path``.  Similarly debugzope script is also changed:
@@ -118,7 +118,7 @@ in ``sys.path``.  Similarly debugzope script is also changed:
     import zc.zope3recipes.debugzope
     <BLANKLINE>
     if __name__ == '__main__':
-        zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main)
+        sys.exit(zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main))
 
 The ``initialization`` setting can be used to provide a bit of
 additional code that will be included in the runzope and debugzope
@@ -165,7 +165,7 @@ before server is started:
     import zope.app.twisted.main
     <BLANKLINE>
     if __name__ == '__main__':
-        zope.app.twisted.main.main()
+        sys.exit(zope.app.twisted.main.main())
 
     >>> cat('parts', 'myapp', 'debugzope')
     #!/usr/local/bin/python2.4
@@ -184,7 +184,7 @@ before server is started:
     import zc.zope3recipes.debugzope
     <BLANKLINE>
     if __name__ == '__main__':
-        zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main)
+        sys.exit(zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main))
 
 If the additional initialization for debugzope needs to be different
 from that of runzope, the ``debug-initialization`` setting can be used.
@@ -234,7 +234,7 @@ Now, Let's run the buildout and see what we get:
     import zc.zope3recipes.debugzope
     <BLANKLINE>
     if __name__ == '__main__':
-        zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main)
+        sys.exit(zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main))
 
 The runzope script still uses the ``initialization`` setting::
 
@@ -252,7 +252,7 @@ The runzope script still uses the ``initialization`` setting::
     import zope.app.twisted.main
     <BLANKLINE>
     if __name__ == '__main__':
-        zope.app.twisted.main.main()
+        sys.exit(zope.app.twisted.main.main())
 
 Setting ``debug-initialization`` to an empty string suppresses the
 ``initialization`` setting for the debugzope script:
@@ -298,7 +298,7 @@ Now, Let's run the buildout and see what we get:
     import zc.zope3recipes.debugzope
     <BLANKLINE>
     if __name__ == '__main__':
-        zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main)
+        sys.exit(zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main))
 
 
 Relative paths
@@ -362,7 +362,7 @@ We get runzope script with relative paths.
     import zope.app.twisted.main
     <BLANKLINE>
     if __name__ == '__main__':
-        zope.app.twisted.main.main()
+        sys.exit(zope.app.twisted.main.main())
 
 Similarly, debugzope script has relative paths.
 
@@ -389,7 +389,7 @@ Similarly, debugzope script has relative paths.
     import zc.zope3recipes.debugzope
     <BLANKLINE>
     if __name__ == '__main__':
-        zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main)
+        sys.exit(zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main))
 
 
 Building Zope 3 Applications (from Zope 3 checkouts/tarballs)
@@ -512,7 +512,7 @@ The runzope script runs the Web server:
     import zope.app.twisted.main
     <BLANKLINE>
     if __name__ == '__main__':
-        zope.app.twisted.main.main()
+        sys.exit(zope.app.twisted.main.main())
 
 It includes in it's path the eggs we specified in the configuration
 file, along with their dependencies. Note that we haven't specified a
@@ -551,7 +551,7 @@ variables available as global variables.
     import zc.zope3recipes.debugzope
     <BLANKLINE>
     if __name__ == '__main__':
-        zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main)
+        sys.exit(zc.zope3recipes.debugzope.debug(main_module=zope.app.twisted.main))
 
 Note that the runzope shown above uses the default, twisted-based
 server components.  It's possible to specify which set of server
@@ -614,7 +614,7 @@ The runzope script generated is identical to what we saw before:
     import zope.app.twisted.main
     <BLANKLINE>
     if __name__ == '__main__':
-        zope.app.twisted.main.main()
+        sys.exit(zope.app.twisted.main.main())
 
 We can also specify the ZServer servers explicitly:
 
@@ -670,7 +670,7 @@ different package this time:
     import zope.app.server.main
     <BLANKLINE>
     if __name__ == '__main__':
-        zope.app.server.main.main()
+        sys.exit(zope.app.server.main.main())
 
 The debugzope script has also been modified to take this into account.
 
@@ -691,7 +691,7 @@ The debugzope script has also been modified to take this into account.
     import zc.zope3recipes.debugzope
     <BLANKLINE>
     if __name__ == '__main__':
-        zc.zope3recipes.debugzope.debug(main_module=zope.app.server.main)
+        sys.exit(zc.zope3recipes.debugzope.debug(main_module=zope.app.server.main))
 
 
 Relative paths
@@ -757,7 +757,7 @@ The runzope script has relative paths.
     import zope.app.server.main
     <BLANKLINE>
     if __name__ == '__main__':
-        zope.app.server.main.main()
+        sys.exit(zope.app.server.main.main())
 
 The debugzope script also has relative paths.
 
@@ -785,7 +785,7 @@ The debugzope script also has relative paths.
     import zc.zope3recipes.debugzope
     <BLANKLINE>
     if __name__ == '__main__':
-        zc.zope3recipes.debugzope.debug(main_module=zope.app.server.main)
+        sys.exit(zc.zope3recipes.debugzope.debug(main_module=zope.app.server.main))
 
 
 Legacy Functional Testing Support
@@ -1568,12 +1568,12 @@ in the buildout bin directory:
     import zc.zope3recipes.ctl
     <BLANKLINE>
     if __name__ == '__main__':
-        zc.zope3recipes.ctl.main([
+        sys.exit(zc.zope3recipes.ctl.main([
             '/sample-buildout/parts/myapp/debugzope',
             '/sample-buildout/parts/instance/zope.conf',
             '-C', '/sample-buildout/parts/instance/zdaemon.conf',
             ]+sys.argv[1:]
-            )
+            ))
 
 Some configuration sections can include a key multiple times; the ZEO
 client section works this way.  When a key is given multiple times,
@@ -2458,12 +2458,12 @@ in a buildout configuration.
     import zc.zope3recipes.ctl
     <BLANKLINE>
     if __name__ == '__main__':
-        zc.zope3recipes.ctl.main([
+        sys.exit(zc.zope3recipes.ctl.main([
             join(base, 'parts/myapp/debugzope'),
             join(base, 'parts/instance/zope.conf'),
             '-C', join(base, 'parts/instance/zdaemon.conf'),
             ]+sys.argv[1:]
-            )
+            ))
 
 
 zope.conf recipe
@@ -2701,7 +2701,6 @@ this a possible replacement for that recipe where appropriate.
       config /sample-buildout/parts/some.conf
     </product-config>
     ...
-
 
 
 Offline recipe
@@ -3162,7 +3161,7 @@ paste-based instance start scripts.
     import paste.script.command
     <BLANKLINE>
     if __name__ == '__main__':
-        paste.script.command.run(['serve']+sys.argv[1:])
+        sys.exit(paste.script.command.run(['serve']+sys.argv[1:]))
 
 
     >>> cat('parts', 'instance', 'zope.conf')
