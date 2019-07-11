@@ -255,23 +255,29 @@ checker = renormalizing.RENormalizing([
 
 def test_suite():
     suite = unittest.TestSuite()
+    optionflags = (
+        doctest.NORMALIZE_WHITESPACE
+        | doctest.ELLIPSIS
+        | doctest.REPORT_ONLY_FIRST_FAILURE
+        | doctest.REPORT_NDIFF
+    )
     if sys.platform[:3].lower() == "win":
         suite.addTest(doctest.DocFileSuite('WINDOWS.txt',
                  setUp=setUp,
                  tearDown=zc.buildout.testing.buildoutTearDown,
                  checker=checker,
-                 optionflags = doctest.NORMALIZE_WHITESPACE+doctest.ELLIPSIS))
+                 optionflags=optionflags))
     else:
         suite.addTest(doctest.DocTestSuite(
             setUp=setUp,
             tearDown=zc.buildout.testing.buildoutTearDown,
             checker=checker,
-            optionflags = doctest.NORMALIZE_WHITESPACE+doctest.ELLIPSIS))
+            optionflags=optionflags))
         suite.addTest(doctest.DocFileSuite('README.txt',
             setUp=setUp,
             tearDown=zc.buildout.testing.buildoutTearDown,
             checker=checker,
-            optionflags = doctest.NORMALIZE_WHITESPACE+doctest.ELLIPSIS))
+            optionflags=optionflags))
 
     return suite
 
