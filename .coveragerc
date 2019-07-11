@@ -1,0 +1,8 @@
+[run]
+source = zc.zope3recipes
+
+[paths]
+source =
+    zc/
+    .tox/*/lib/python*/site-packages/zc/
+    .tox/pypy*/site-packages/zc/
