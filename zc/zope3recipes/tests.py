@@ -242,6 +242,11 @@ checker = renormalizing.RENormalizing([
     ), ''),
     (re.compile("""['"][^\n"']+zope3recipes[^\n"']*['"],"""),
      "'/zope3recipes',"),
+    # welp, when we do things like `tox -e coverage`, everything's in
+    # .tox/coverage/lib/pythonX.Y/site-packages and that's what gets added to
+    # sys.path in the generated scripts
+    (re.compile("""['"][^\n"']+site-packages['"],"""),
+     "'/zope3recipes',"),
     (re.compile('#![^\n]+\n'), ''),
     (re.compile('-[^-]+-py\d[.]\d(-\S+)?.egg'),
      '-pyN.N.egg',
@@ -250,7 +255,11 @@ checker = renormalizing.RENormalizing([
     (re.compile(r'\bdistribute-pyN\.N\.egg'),
      'setuptools-pyN.N.egg',
     ),
-    ])
+    # Sometimes buildout decides to also install six
+    (re.compile(
+    r"Getting distribution for 'six'\.\nGot six [0-9.]+\.\n"
+    ), ''),
+])
 
 
 def test_suite():
