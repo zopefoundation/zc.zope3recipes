@@ -1559,9 +1559,6 @@ in the buildout bin directory:
     <BLANKLINE>
     import sys
     sys.path[0:0] = [
-      '/sample-buildout/eggs/zdaemon-2.0-py2.4.egg',
-      '/sample-buildout/eggs/setuptools-0.6-py2.4.egg',
-      '/sample-buildout/eggs/ZConfig-2.3-py2.4.egg',
       '/zope3recipes',
       ]
     <BLANKLINE>
@@ -2449,9 +2446,6 @@ in a buildout configuration.
     <BLANKLINE>
     import sys
     sys.path[0:0] = [
-      join(base, 'eggs/zdaemon-pyN.N.egg'),
-      join(base, 'eggs/setuptools-pyN.N.egg'),
-      join(base, 'eggs/ZConfig-pyN.N.egg'),
       '/zope3recipes',
       ]
     <BLANKLINE>
@@ -3149,13 +3143,10 @@ paste-based instance start scripts.
     <BLANKLINE>
     import sys
     sys.path[0:0] = [
-        '/sample-buildout/demo2',
-        '/sample-buildout/eggs/PasteScript-1.7.4.2-py2.6.egg',
-        '/sample-buildout/eggs/setuptools-0.6c12dev_r88846-py2.6.egg',
-        '/sample-buildout/eggs/PasteDeploy-1.5.0-py2.6.egg',
-        '/sample-buildout/eggs/Paste-1.7.5.1-py2.6.egg',
-        '/sample-buildout/demo1',
-        ]
+      '/sample-buildout/demo2',
+      '/.../zope3recipes/lib/python.../site-packages',
+      '/sample-buildout/demo1',
+      ]
     <BLANKLINE>
     <BLANKLINE>
     import paste.script.command

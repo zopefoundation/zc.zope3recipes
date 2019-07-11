@@ -1169,9 +1169,6 @@ in the buildout bin directory:
     <BLANKLINE>
     import sys
     sys.path[0:0] = [
-      '/sample-buildout/eggs/zdaemon-2.0-py2.4.egg',
-      '/sample-buildout/eggs/setuptools-0.6-py2.4.egg',
-      '/sample-buildout/eggs/ZConfig-2.3-py2.4.egg',
       '/zope3recipes',
       ]
     <BLANKLINE>
