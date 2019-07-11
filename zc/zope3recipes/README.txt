@@ -1875,7 +1875,7 @@ rc-directory
     installed.
 
 logrotate-directory
-    The name ot the directory where logrotate configuration files should be
+    The name of the directory where logrotate configuration files should be
     installed.
 
 user
