@@ -12,6 +12,9 @@ init:
 install:
   - "set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - python --version
+  # Upgrade virtualenv because the one in the Appveyor image is old and has an
+  # old bundled pip version that thinks 'zc.recipe.egg' is an egg.
+  - pip install -U virtualenv
   - pip install tox
 
 build: off
