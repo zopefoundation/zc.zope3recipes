@@ -12,12 +12,15 @@
 #
 ##############################################################################
 
-import re, sys, os
+import doctest
+import os
+import re
+import sys
+import unittest
 
 import zc.buildout.testing
+from zope.testing import renormalizing
 
-import unittest
-from zope.testing import doctest, renormalizing
 
 def ls_optional(dir, ignore=(), *subs):
     if subs:
@@ -34,6 +37,7 @@ def ls_optional(dir, ignore=(), *subs):
         else:
             print '- ',
         print name
+
 
 def test_ctl():
     """
@@ -270,6 +274,7 @@ def test_suite():
             optionflags = doctest.NORMALIZE_WHITESPACE+doctest.ELLIPSIS))
 
     return suite
+
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
