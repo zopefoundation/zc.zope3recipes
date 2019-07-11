@@ -243,7 +243,7 @@ checker = renormalizing.RENormalizing([
     (re.compile("""['"][^\n"']+zope3recipes[^\n"']*['"],"""),
      "'/zope3recipes',"),
     (re.compile('#![^\n]+\n'), ''),
-    (re.compile('-\S+-py\d[.]\d(-\S+)?.egg'),
+    (re.compile('-[^-]+-py\d[.]\d(-\S+)?.egg'),
      '-pyN.N.egg',
     ),
     # Turn "distribute" into "setuptools" so the tests can pass with either:
