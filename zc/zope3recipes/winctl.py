@@ -211,7 +211,7 @@ class ZopectlCmd(zdaemon.zdctl.ZDCmd):
         self.proc = Popen(program)
         self.zd_pid = self.proc.pid
         self.zd_up = 1
-        self.awhile(lambda: self.zd_pid,
+        self.awhile(lambda n: self.zd_pid,
                     "Zope3 started in debug mode, pid=%(zd_pid)d")
 
     def help_debug(self):
@@ -261,7 +261,7 @@ class ZopectlCmd(zdaemon.zdctl.ZDCmd):
         self.zd_up = 0
         self.zd_pid = 0
         cpid = win32process.GetCurrentProcessId()
-        self.awhile(lambda: not getChildrenPidsOfPid(cpid), "Zope3 stopped")
+        self.awhile(lambda n: not getChildrenPidsOfPid(cpid), "Zope3 stopped")
 
     def do_kill(self, arg):
         self.do_stop(arg)
@@ -273,7 +273,7 @@ class ZopectlCmd(zdaemon.zdctl.ZDCmd):
             self.do_start(arg)
         else:
             self.do_start(arg)
-        self.awhile(lambda: self.zd_pid not in (0, pid),
+        self.awhile(lambda n: self.zd_pid not in (0, pid),
                     "Zope3 restarted, pid=%(zd_pid)d")
 
     def show_options(self):
@@ -295,7 +295,7 @@ class ZopectlCmd(zdaemon.zdctl.ZDCmd):
         self.proc = Popen(program)
         self.zd_pid = self.proc.pid
         self.zd_up = 1
-        self.awhile(lambda: self.zd_pid,
+        self.awhile(lambda n: self.zd_pid,
                     "Zope3 started, pid=%(zd_pid)d")
 
     def do_fg(self, arg):

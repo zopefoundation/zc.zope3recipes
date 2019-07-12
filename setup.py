@@ -58,7 +58,7 @@ setup(
              ],
         },
     extras_require = dict(
-        tests = ['zdaemon', 'zc.recipe.filestorage', 'PasteScript'],
+        tests=['zdaemon >= 3.0.0', 'zc.recipe.filestorage', 'PasteScript'],
         ),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
