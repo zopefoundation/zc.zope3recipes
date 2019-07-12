@@ -1,0 +1,10 @@
+*.py[co]
+.tox/
+*.egg-info
+.coverage
+.installed.cfg
+bin/
+eggs/
+develop-eggs/
+parts/
+.coverage*

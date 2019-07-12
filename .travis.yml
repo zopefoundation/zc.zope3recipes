@@ -1,0 +1,18 @@
+language: python
+dist: xenial
+python:
+  - 2.7
+install:
+  - pip install zope.testrunner coverage coveralls
+  - pip install -e '.[tests]'
+script:
+  - export COVERAGE_HOME=$(pwd)
+  - export COVERAGE_PROCESS_START=$COVERAGE_HOME/.coveragerc
+  - coverage run -m zope.testrunner --test-path=. -vc
+after_script:
+  - coverage combine
+  - coverage report -m
+  - coveralls
+notifications:
+  email: false
+cache: pip

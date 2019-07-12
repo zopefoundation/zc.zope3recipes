@@ -12,12 +12,15 @@
 #
 ##############################################################################
 
-import re, sys, os
+import doctest
+import os
+import re
+import sys
+import unittest
 
 import zc.buildout.testing
+from zope.testing import renormalizing
 
-import unittest
-from zope.testing import doctest, renormalizing
 
 def ls_optional(dir, ignore=(), *subs):
     if subs:
@@ -34,6 +37,7 @@ def ls_optional(dir, ignore=(), *subs):
         else:
             print '- ',
         print name
+
 
 def test_ctl():
     """
@@ -236,40 +240,88 @@ checker = renormalizing.RENormalizing([
     "\(maybe misspelled\?\)"
     "\n"
     ), ''),
-    (re.compile("""['"][^\n"']+zope3recipes[^\n"']*['"],"""),
-     "'/zope3recipes',"),
+    # Windows
+    (re.compile(r'\r\n'), '\n'),
+    # this directory
+    (re.compile(r"""['"][^\n"']+zc.zope3recipes['"],"""),
+     "'/zc.zope3recipes',"),
+    # welp, when we do things like `tox -e coverage`, everything's in
+    # .tox/coverage/lib/pythonX.Y/site-packages and that's what gets added to
+    # sys.path in the generated scripts
+    (re.compile("""['"][^\n"']+site-packages['"],"""),
+     "'/site-packages',"),
     (re.compile('#![^\n]+\n'), ''),
-    (re.compile('-\S+-py\d[.]\d(-\S+)?.egg'),
+    (re.compile('-[^-]+-py\d[.]\d(-\S+)?.egg'),
      '-pyN.N.egg',
     ),
     # Turn "distribute" into "setuptools" so the tests can pass with either:
     (re.compile(r'\bdistribute-pyN\.N\.egg'),
      'setuptools-pyN.N.egg',
     ),
-    ])
+    # Sometimes buildout decides to also install six
+    (re.compile(
+    r"Getting distribution for 'six'\.\nGot six [0-9.]+\.\n"
+    ), ''),
+    # Running the tests under coverage changes the output ordering!  This makes
+    # no sense!
+    (re.compile(
+    r"( *'/zope3recipes',\n)( *'/sample-buildout/demo1',\n)"
+    ), r'\2\1'),
+    # Running the tests with buildout + bin/test adds ZConfig and zdaemon
+    # eggs to sys.path of generated tests.  Running the tests with tox does
+    # not (because ZConfig and zdaemon are already in .../site-packages)
+    (re.compile(
+        r" *'/sample-buildout/eggs/(ZConfig|zdaemon)-pyN.N.egg',\n"
+    ), ''),
+    (re.compile(
+        r" *join\(base, 'eggs/(ZConfig|zdaemon)-pyN.N.egg'\),\n"
+    ), ''),
+    (re.compile(
+        r"( *'/sample-buildout/eggs/(PasteScript|six|PasteDeploy|Paste)-pyN.N.egg',\n)+"
+    ), "  '/site-packages',\n"),
+    # tox -e coverage does this!  I've no idea why!
+    (re.compile(
+        r"Uninstalling myapp.\n"
+        r"(Updating database.\n|Installing database.\n|Uninstalling database.\n|)"
+        r"Installing myapp.\n"
+        r"(Generated script '/sample-buildout/parts/myapp/[^']+'\.\n)*",
+    ), "\\1Updating myapp.\n"),
+    (re.compile(
+        r"Uninstalling instance.\n"
+        r"(Updating myapp.\n|)"
+        r"Installing instance.\n"
+        r"(Generated script '/sample-buildout/bin/[^']+'\.\n)*",
+    ), "\\1Updating instance.\n"),
+])
 
 
 def test_suite():
     suite = unittest.TestSuite()
+    optionflags = (
+        doctest.NORMALIZE_WHITESPACE
+        | doctest.ELLIPSIS
+        | doctest.REPORT_NDIFF
+    )
     if sys.platform[:3].lower() == "win":
         suite.addTest(doctest.DocFileSuite('WINDOWS.txt',
                  setUp=setUp,
                  tearDown=zc.buildout.testing.buildoutTearDown,
                  checker=checker,
-                 optionflags = doctest.NORMALIZE_WHITESPACE+doctest.ELLIPSIS))
+                 optionflags=optionflags))
     else:
         suite.addTest(doctest.DocTestSuite(
             setUp=setUp,
             tearDown=zc.buildout.testing.buildoutTearDown,
             checker=checker,
-            optionflags = doctest.NORMALIZE_WHITESPACE+doctest.ELLIPSIS))
+            optionflags=optionflags))
         suite.addTest(doctest.DocFileSuite('README.txt',
             setUp=setUp,
             tearDown=zc.buildout.testing.buildoutTearDown,
             checker=checker,
-            optionflags = doctest.NORMALIZE_WHITESPACE+doctest.ELLIPSIS))
+            optionflags=optionflags))
 
     return suite
+
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')

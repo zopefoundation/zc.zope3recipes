@@ -11,7 +11,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-name, version = "zc.zope3recipes", "0"
+name, version = "zc.zope3recipes", "0.19.0.dev0"
 
 import os
 from setuptools import setup, find_packages
@@ -58,7 +58,7 @@ setup(
              ],
         },
     extras_require = dict(
-        tests = ['zdaemon', 'zc.recipe.filestorage', 'PasteScript'],
+        tests=['zdaemon >= 3.0.0', 'zc.recipe.filestorage', 'PasteScript'],
         ),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
