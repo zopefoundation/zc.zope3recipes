@@ -240,13 +240,14 @@ checker = renormalizing.RENormalizing([
     "\(maybe misspelled\?\)"
     "\n"
     ), ''),
-    (re.compile("""['"][^\n"']+zope3recipes[^\n"']*['"],"""),
-     "'/zope3recipes',"),
+    # this directory
+    (re.compile(r"""['"][^\n"']+zc\.zope3recipes['"],"""),
+     "'/zc.zope3recipes',"),
     # welp, when we do things like `tox -e coverage`, everything's in
     # .tox/coverage/lib/pythonX.Y/site-packages and that's what gets added to
     # sys.path in the generated scripts
     (re.compile("""['"][^\n"']+site-packages['"],"""),
-     "'/zope3recipes',"),
+     "'/site-packages',"),
     (re.compile('#![^\n]+\n'), ''),
     (re.compile('-[^-]+-py\d[.]\d(-\S+)?.egg'),
      '-pyN.N.egg',
@@ -262,8 +263,20 @@ checker = renormalizing.RENormalizing([
     # Running the tests under coverage changes the output ordering!  This makes
     # no sense!
     (re.compile(
-    r"(\s*'/sample-buildout/demo1',\n)(\s*'/zope3recipes',\n)"
+    r"( *'/zope3recipes',\n)( *'/sample-buildout/demo1',\n)"
     ), r'\2\1'),
+    # Running the tests with buildout + bin/test adds ZConfig and zdaemon
+    # eggs to sys.path of generated tests.  Running the tests with tox does
+    # not (because ZConfig and zdaemon are already in .../site-packages)
+    (re.compile(
+        r" *'/sample-buildout/eggs/(ZConfig|zdaemon)-pyN.N.egg',\n"
+    ), ''),
+    (re.compile(
+        r" *join\(base, 'eggs/(ZConfig|zdaemon)-pyN.N.egg'\),\n"
+    ), ''),
+    (re.compile(
+        r"( *'/sample-buildout/eggs/(PasteScript|six|PasteDeploy|Paste)-pyN.N.egg',\n)+"
+    ), "  '/site-packages',\n"),
 ])
 
 

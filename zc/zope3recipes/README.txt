@@ -109,7 +109,7 @@ in ``sys.path``.  Similarly debugzope script is also changed:
     sys.path[0:0] = [
       '/sample-buildout/demo2',
       '/sample-buildout/demo1',
-      '/zope3recipes',
+      '/zc.zope3recipes',
       ]
     <BLANKLINE>
     import zope.app.twisted.main
@@ -174,7 +174,7 @@ before server is started:
     sys.path[0:0] = [
       '/sample-buildout/demo2',
       '/sample-buildout/demo1',
-      '/zope3recipes',
+      '/zc.zope3recipes',
       ]
     <BLANKLINE>
     print "Starting application server."
@@ -224,7 +224,7 @@ Now, Let's run the buildout and see what we get:
     sys.path[0:0] = [
       '/sample-buildout/demo2',
       '/sample-buildout/demo1',
-      '/zope3recipes',
+      '/zc.zope3recipes',
       ]
     <BLANKLINE>
     print "Starting debugging interaction."
@@ -289,7 +289,7 @@ Now, Let's run the buildout and see what we get:
     sys.path[0:0] = [
       '/sample-buildout/demo2',
       '/sample-buildout/demo1',
-      '/zope3recipes',
+      '/zc.zope3recipes',
       ]
     <BLANKLINE>
     import zope.app.twisted.main
@@ -380,7 +380,7 @@ Similarly, debugzope script has relative paths.
     sys.path[0:0] = [
       join(base, 'demo2'),
       join(base, 'demo1'),
-      '/zope3recipes',
+      '/zc.zope3recipes',
       ]
     <BLANKLINE>
     import zope.app.twisted.main
@@ -542,7 +542,7 @@ variables available as global variables.
       '/sample-buildout/demo2',
       '/sample-buildout/demo1',
       '/zope3/src',
-      '/zope3recipes',
+      '/zc.zope3recipes',
       ]
     <BLANKLINE>
     import zope.app.twisted.main
@@ -682,7 +682,7 @@ The debugzope script has also been modified to take this into account.
       '/sample-buildout/demo2',
       '/sample-buildout/demo1',
       '/zope3/src',
-      '/zope3recipes',
+      '/zc.zope3recipes',
       ]
     <BLANKLINE>
     import zope.app.server.main
@@ -776,7 +776,7 @@ The debugzope script also has relative paths.
       join(base, 'demo2'),
       join(base, 'demo1'),
       '/zope3/src',
-      '/zope3recipes',
+      '/zc.zope3recipes',
       ]
     <BLANKLINE>
     import zope.app.server.main
@@ -1559,7 +1559,8 @@ in the buildout bin directory:
     <BLANKLINE>
     import sys
     sys.path[0:0] = [
-      '/zope3recipes',
+      '/site-packages',
+      '/zc.zope3recipes',
       ]
     <BLANKLINE>
     import zc.zope3recipes.ctl
@@ -2446,7 +2447,8 @@ in a buildout configuration.
     <BLANKLINE>
     import sys
     sys.path[0:0] = [
-      '/zope3recipes',
+      '/site-packages',
+      '/zc.zope3recipes',
       ]
     <BLANKLINE>
     import zc.zope3recipes.ctl
@@ -3144,10 +3146,9 @@ paste-based instance start scripts.
     import sys
     sys.path[0:0] = [
       '/sample-buildout/demo2',
-      '/.../zope3recipes/lib/python.../site-packages',
       '/sample-buildout/demo1',
+      '/site-packages',
       ]
-    <BLANKLINE>
     <BLANKLINE>
     import paste.script.command
     <BLANKLINE>
