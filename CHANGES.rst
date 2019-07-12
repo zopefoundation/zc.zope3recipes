@@ -2,7 +2,7 @@
  Releases
 ==========
 
-0.19.0 (unreleased)
+0.19.0 (2019-07-12)
 ===================
 
 - Fix TypeError: <lambda>() takes no arguments (1 given) on Windows
