@@ -38,10 +38,11 @@ setup(
         + '\n' +
         read('CHANGES.rst')
         + '\n' +
-        'Detailed Documentation\n'
-        '**********************\n'
+        '========================\n'
+        ' Detailed Documentation\n'
+        '========================\n'
         + '\n' +
-        read('zc', 'zope3recipes', 'README.rst')
+        read('zc', 'zope3recipes', 'README.rst').split('\n\n', 1)[1]
     ),
     packages=find_packages('.'),
     include_package_data=True,
