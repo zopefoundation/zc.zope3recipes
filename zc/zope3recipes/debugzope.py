@@ -18,6 +18,7 @@ import os
 import sys
 import traceback
 
+import six
 import zope.app.debug
 import zope.app.appsetup.interfaces
 import zope.app.appsetup.product
@@ -46,15 +47,13 @@ def zglobals(options):
     startup = os.environ.get("PYTHONSTARTUP")
     if startup:
         try:
-            f = open(startup)
+            with open(startup) as f:
+                globs["__file__"] = startup
+                six.exec_(f.read(), globs)
+                del globs["__file__"]
         except (OSError, IOError):
             # Not readable or not there, which is allowed.
             pass
-        else:
-            f.close()
-            globs["__file__"] = startup
-            execfile(startup, globs, globs)
-            del globs["__file__"]
 
     app = zope.app.debug.Debugger.fromDatabase(db)
     globs["app"] = app
@@ -87,7 +86,8 @@ def debug(args=None, main_module=None):
     if args:
         sys.argv[:] = args
         globs['__file__'] = sys.argv[0]
-        execfile(sys.argv[0], globs)
+        with open(sys.argv[0]) as f:
+            six.exec_(f.read(), globs)
         sys.exit()
     else:
         import code

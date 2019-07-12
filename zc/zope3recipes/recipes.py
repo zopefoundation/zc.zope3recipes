@@ -795,7 +795,7 @@ sys.argv[1:1] = [
     "-C",
     %(config)r,
     %(script)s
-    ]
+]
 
 debugzope = %(debugzope)r
 globals()["__file__"] = debugzope
@@ -806,5 +806,6 @@ zeo_logger.addHandler(logging.StreamHandler())
 %(initialization)s
 
 # print("starting debugzope...")
-execfile(debugzope)
+with open(debugzope) as f:
+    exec(f.read())
 '''

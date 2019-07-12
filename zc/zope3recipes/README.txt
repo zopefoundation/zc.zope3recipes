@@ -2818,7 +2818,7 @@ a configuration file (that supports a "location" option) to exist.
         "-C",
         '/zope3',
     <BLANKLINE>
-        ]
+    ]
     <BLANKLINE>
     debugzope = '/sample-buildout/parts/myapp/debugzope'
     globals()["__file__"] = debugzope
@@ -2828,7 +2828,8 @@ a configuration file (that supports a "location" option) to exist.
     <BLANKLINE>
     <BLANKLINE>
     # print("starting debugzope...")
-    execfile(debugzope)
+    with open(debugzope) as f:
+        exec(f.read())
 
 
 initialization option
@@ -2940,7 +2941,7 @@ The recipe also accepts an "initialization" option:
         "-C",
         '/zope3',
     <BLANKLINE>
-        ]
+    ]
     <BLANKLINE>
     debugzope = '/sample-buildout/parts/myapp/debugzope'
     globals()["__file__"] = debugzope
@@ -2951,7 +2952,8 @@ The recipe also accepts an "initialization" option:
     os.environ['ZC_DEBUG_LOGGING'] = 'on'
     <BLANKLINE>
     # print("starting debugzope...")
-    execfile(debugzope)
+    with open(debugzope) as f:
+        exec(f.read())
 
 
 script option
@@ -3064,8 +3066,7 @@ as well as a "script" option.
         "-C",
         '/zope3',
         '/zope3/foo.py'
-    <BLANKLINE>
-        ]
+    ]
     <BLANKLINE>
     debugzope = '/sample-buildout/parts/myapp/debugzope'
     globals()["__file__"] = debugzope
@@ -3076,7 +3077,9 @@ as well as a "script" option.
     os.environ['ZC_DEBUG_LOGGING'] = 'on'
     <BLANKLINE>
     # print("starting debugzope...")
-    execfile(debugzope)
+    with open(debugzope) as f:
+        exec(f.read())
+
 
 Paste-deployment support
 ========================
