@@ -21,6 +21,14 @@ Releases
 ********
 
 ===================
+0.19.0 (unreleased)
+===================
+
+- Fix TypeError: <lambda>() takes no arguments (1 given) on Windows
+  with zdaemon >= 3.0.0.
+
+
+===================
 0.18.0 (2013/02/05)
 ===================
 
