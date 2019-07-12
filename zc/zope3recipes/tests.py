@@ -240,6 +240,8 @@ checker = renormalizing.RENormalizing([
     "\(maybe misspelled\?\)"
     "\n"
     ), ''),
+    # Windows
+    (re.compile(r'\r\n'), '\n'),
     # this directory
     (re.compile(r"""['"][^\n"']+zc.zope3recipes['"],"""),
      "'/zc.zope3recipes',"),
@@ -280,10 +282,16 @@ checker = renormalizing.RENormalizing([
     # tox -e coverage does this!  I've no idea why!
     (re.compile(
         r"Uninstalling myapp.\n"
-        r"(Updating database.\n|)"
+        r"(Updating database.\n|Installing database.\n|Uninstalling database.\n|)"
         r"Installing myapp.\n"
         r"(Generated script '/sample-buildout/parts/myapp/[^']+'\.\n)*",
-    ), "Updating myapp.\n\\1"),
+    ), "\\1Updating myapp.\n"),
+    (re.compile(
+        r"Uninstalling instance.\n"
+        r"(Updating myapp.\n|)"
+        r"Installing instance.\n"
+        r"(Generated script '/sample-buildout/bin/[^']+'\.\n)*",
+    ), "\\1Updating instance.\n"),
 ])
 
 
