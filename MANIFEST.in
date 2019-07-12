@@ -2,3 +2,8 @@ include *.rst
 include *.py
 include buildout.cfg
 recursive-include zc *.rst
+
+# added by check_manifest.py
+include *.yml
+include .coveragerc
+include tox.ini
