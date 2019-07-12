@@ -1,5 +1,7 @@
 [run]
 source = zc.zope3recipes
+parallel = true
+data_file = $COVERAGE_HOME/.coverage
 
 [paths]
 source =
