@@ -311,7 +311,7 @@ def test_suite():
     if sys.platform[:3].lower() == "win":
         suite.addTest(
             doctest.DocFileSuite(
-                'WINDOWS.txt',
+                'WINDOWS.rst',
                 setUp=setUp,
                 tearDown=zc.buildout.testing.buildoutTearDown,
                 checker=checker,
@@ -329,7 +329,7 @@ def test_suite():
         )
         suite.addTest(
             doctest.DocFileSuite(
-                'README.txt',
+                'README.rst',
                 setUp=setUp,
                 tearDown=zc.buildout.testing.buildoutTearDown,
                 checker=checker,

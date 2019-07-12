@@ -1,3 +1,4 @@
+include *.rst
 include *.py
 include buildout.cfg
-recursive-include zc *.txt
+recursive-include zc *.rst
