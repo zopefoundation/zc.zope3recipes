@@ -259,6 +259,11 @@ checker = renormalizing.RENormalizing([
     (re.compile(
     r"Getting distribution for 'six'\.\nGot six [0-9.]+\.\n"
     ), ''),
+    # Running the tests under coverage changes the output ordering!  This makes
+    # no sense!
+    (re.compile(
+    r"(\s*'/sample-buildout/demo1',\n)(\s*'/zope3recipes',\n)"
+    ), r'\2\1'),
 ])
 
 
