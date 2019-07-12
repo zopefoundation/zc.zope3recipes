@@ -12,15 +12,17 @@
 #
 ##############################################################################
 """Zope 3 program entry points
-
-$Id$
 """
 
-import os, sys, traceback
+import os
+import sys
+import traceback
+
 import zope.app.debug
 import zope.app.appsetup.interfaces
-from zope.event import notify
 import zope.app.appsetup.product
+from zope.event import notify
+
 
 def load_options(args, main_module=None):
     options = main_module.ZopeOptions()
@@ -61,6 +63,7 @@ def zglobals(options):
 
     return globs
 
+
 def debug(args=None, main_module=None):
     if args is None:
         args = sys.argv[1:]
@@ -70,7 +73,7 @@ def debug(args=None, main_module=None):
         options.configroot.eventlog.startup()
     try:
         globs = zglobals(options.configroot)
-    except:
+    except Exception:
         if options.args:
             raise
         else:
@@ -78,7 +81,6 @@ def debug(args=None, main_module=None):
             import pdb
             pdb.post_mortem(sys.exc_info()[2])
             return
-
 
     args = options.args
 
@@ -90,6 +92,7 @@ def debug(args=None, main_module=None):
     else:
         import code
         code.interact(banner=banner, local=globs)
+
 
 banner = """Welcome to the Zope 3 "debugger".
 The application root object is available as the root variable.

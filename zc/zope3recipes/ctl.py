@@ -14,8 +14,11 @@
 """Top-level controller for 'zopectl'.
 """
 
-import os, sys
+import os
+import sys
+
 import zdaemon.zdctl
+
 
 class ZopectlCmd(zdaemon.zdctl.ZDCmd):
 
@@ -25,15 +28,15 @@ class ZopectlCmd(zdaemon.zdctl.ZDCmd):
                    *self.options.args[1:])
 
     def help_debug(self):
-        print "debug -- Initialize the Zope application, providing a"
-        print "         debugger object at an interactive Python prompt."
+        print("debug -- Initialize the Zope application, providing a")
+        print("         debugger object at an interactive Python prompt.")
 
     do_run = do_debug
 
     def help_run(self):
-        print "run <script> [args] -- run a Python script with the Zope "
-        print "                       environment set up.  The script has "
-        print "                       'root' exposed as the root container."
+        print("run <script> [args] -- run a Python script with the Zope")
+        print("                       environment set up.  The script has")
+        print("                       'root' exposed as the root container.")
 
 
 def main(args=None):

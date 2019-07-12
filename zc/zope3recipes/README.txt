@@ -8,6 +8,7 @@ and software configuration, expressed as ZCML.  A Zope instance
 invokes the application with a specific instance configuration.  A
 single application may have many instances.
 
+
 Building Zope 3 applications (from eggs)
 ========================================
 
@@ -76,7 +77,7 @@ We'll create a buildout.cfg file that defines our application:
 
 Now, Let's run the buildout and see what we get:
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Installing myapp.
@@ -135,12 +136,12 @@ scripts just before the server's main function is called:
     ... site.zcml = <include package="demo2" />
     ... eggs = demo2
     ... initialization =
-    ...     print "Starting application server."
+    ...     print("Starting application server.")
     ... ''')
 
 Now, Let's run the buildout and see what we get:
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling myapp.
@@ -160,7 +161,7 @@ before server is started:
       '/sample-buildout/demo1',
       ]
     <BLANKLINE>
-    print "Starting application server."
+    print("Starting application server.")
     <BLANKLINE>
     import zope.app.twisted.main
     <BLANKLINE>
@@ -177,7 +178,7 @@ before server is started:
       '/zc.zope3recipes',
       ]
     <BLANKLINE>
-    print "Starting application server."
+    print("Starting application server.")
     import zope.app.twisted.main
     <BLANKLINE>
     <BLANKLINE>
@@ -202,14 +203,14 @@ If set, that is used for debugzope *instead* of the value of
     ... site.zcml = <include package="demo2" />
     ... eggs = demo2
     ... initialization =
-    ...     print "Starting application server."
+    ...     print("Starting application server.")
     ... debug-initialization =
-    ...     print "Starting debugging interaction."
+    ...     print("Starting debugging interaction.")
     ... ''')
 
 Now, Let's run the buildout and see what we get:
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling myapp.
@@ -227,7 +228,7 @@ Now, Let's run the buildout and see what we get:
       '/zc.zope3recipes',
       ]
     <BLANKLINE>
-    print "Starting debugging interaction."
+    print("Starting debugging interaction.")
     import zope.app.twisted.main
     <BLANKLINE>
     <BLANKLINE>
@@ -247,7 +248,7 @@ The runzope script still uses the ``initialization`` setting::
       '/sample-buildout/demo1',
       ]
     <BLANKLINE>
-    print "Starting application server."
+    print("Starting application server.")
     <BLANKLINE>
     import zope.app.twisted.main
     <BLANKLINE>
@@ -268,13 +269,13 @@ Setting ``debug-initialization`` to an empty string suppresses the
     ... site.zcml = <include package="demo2" />
     ... eggs = demo2
     ... initialization =
-    ...     print "Starting application server."
+    ...     print("Starting application server.")
     ... debug-initialization =
     ... ''')
 
 Now, Let's run the buildout and see what we get:
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling myapp.
@@ -333,7 +334,7 @@ Let's change a buildout configuration to include ``relative-paths``.
     ... eggs = demo2
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling myapp.
@@ -448,7 +449,7 @@ the zope namespace.  A configure directive will be included for us.
 
 Let's run the buildout and see what we get:
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling myapp.
@@ -590,7 +591,7 @@ explicit:
     ... eggs = demo2
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Updating myapp.
@@ -645,7 +646,7 @@ We can also specify the ZServer servers explicitly:
     ... eggs = demo2
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling myapp.
@@ -727,7 +728,7 @@ We can also request relative paths.
     ... eggs = demo2
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling myapp.
@@ -849,7 +850,7 @@ If we modify our buildout to include an ftesting.zcml option:
     ... eggs = demo2
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling myapp.
@@ -990,7 +991,7 @@ instance part.
 
 Let's run the buildout, and see what we get:
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling myapp.
@@ -1085,7 +1086,7 @@ the names of the server types are adjusted appropriately:
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -1164,7 +1165,7 @@ The Twisted-based servers can also be specified explicitly:
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -1257,7 +1258,7 @@ If we specify a server section ourselves:
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -1334,7 +1335,7 @@ the address option which accepts zero or more address specifications:
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -1423,7 +1424,7 @@ access log:
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -1524,7 +1525,7 @@ simply provide a zdaemon.conf option in your instance section:
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -1625,7 +1626,7 @@ which they're give in the input::
     ...
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -1718,7 +1719,7 @@ used, but it does affect the name of the run script in bin:
     ...
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -1787,7 +1788,7 @@ alternate site definition:
     ...
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -1942,7 +1943,7 @@ Here we've added a deployment section, myapp-deployment, and added a
 deployment option to our instance part telling the instance recipe to
 use the deployment.  If we rerun the buildout:
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -2090,7 +2091,7 @@ the generated files:
     ... user = zope
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -2198,7 +2199,7 @@ Let's take a look at setting the content to a non-empty value directly:
     ... user = zope
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -2256,7 +2257,7 @@ If we set ``logrotate.conf`` to an empty string, the file is not generated:
     ... user = zope
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -2329,7 +2330,7 @@ Let's update our buildout to add a new instance:
     ... user = zope
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -2420,7 +2421,7 @@ in a buildout configuration.
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance2.
@@ -2492,7 +2493,7 @@ instance.
     ...
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Uninstalling instance.
     Uninstalling myapp.
@@ -2555,7 +2556,7 @@ We can specify the location of the access log directly in the part:
     ...
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/tmp/tmp2eRRw1buildoutSetUp/_TEST_/sample-buildout/demo1'
     Uninstalling some.conf.
     Updating myapp.
@@ -2614,7 +2615,7 @@ The address of the server can be set using the "address" setting:
     ...
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/tmp/tmp2eRRw1buildoutSetUp/_TEST_/sample-buildout/demo1'
     Uninstalling some.conf.
     Updating myapp.
@@ -2683,7 +2684,7 @@ this a possible replacement for that recipe where appropriate.
     ...
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/tmp/tmp2eRRw1buildoutSetUp/_TEST_/sample-buildout/demo1'
     Uninstalling some.conf.
     Updating myapp.
@@ -2767,7 +2768,7 @@ a configuration file (that supports a "location" option) to exist.
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling another.conf.
@@ -2796,7 +2797,7 @@ a configuration file (that supports a "location" option) to exist.
         if pwd.getpwnam(None).pw_uid != os.geteuid():
             restart = True
             argv[:0] = ["sudo", "-u", None]
-            # print "switching to user", None
+            # print("switching to user %s" % None)
         del pwd
     <BLANKLINE>
     for k in env:
@@ -2806,7 +2807,7 @@ a configuration file (that supports a "location" option) to exist.
         del k
     <BLANKLINE>
     if restart:
-        # print "restarting"
+        # print("restarting")
         os.execvpe(argv[0], argv, dict(os.environ))
     <BLANKLINE>
     del argv
@@ -2826,7 +2827,7 @@ a configuration file (that supports a "location" option) to exist.
     zeo_logger.addHandler(logging.StreamHandler())
     <BLANKLINE>
     <BLANKLINE>
-    # print "starting debugzope..."
+    # print("starting debugzope...")
     execfile(debugzope)
 
 
@@ -2895,7 +2896,7 @@ The recipe also accepts an "initialization" option:
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling offline.
@@ -2918,7 +2919,7 @@ The recipe also accepts an "initialization" option:
         if pwd.getpwnam(None).pw_uid != os.geteuid():
             restart = True
             argv[:0] = ["sudo", "-u", None]
-            # print "switching to user", None
+            # print("switching to user %s" % None)
         del pwd
     <BLANKLINE>
     for k in env:
@@ -2928,7 +2929,7 @@ The recipe also accepts an "initialization" option:
         del k
     <BLANKLINE>
     if restart:
-        # print "restarting"
+        # print("restarting")
         os.execvpe(argv[0], argv, dict(os.environ))
     <BLANKLINE>
     del argv
@@ -2949,7 +2950,7 @@ The recipe also accepts an "initialization" option:
     <BLANKLINE>
     os.environ['ZC_DEBUG_LOGGING'] = 'on'
     <BLANKLINE>
-    # print "starting debugzope..."
+    # print("starting debugzope...")
     execfile(debugzope)
 
 
@@ -3019,7 +3020,7 @@ as well as a "script" option.
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling offline.
@@ -3042,7 +3043,7 @@ as well as a "script" option.
         if pwd.getpwnam(None).pw_uid != os.geteuid():
             restart = True
             argv[:0] = ["sudo", "-u", None]
-            # print "switching to user", None
+            # print("switching to user %s" % None)
         del pwd
     <BLANKLINE>
     for k in env:
@@ -3052,7 +3053,7 @@ as well as a "script" option.
         del k
     <BLANKLINE>
     if restart:
-        # print "restarting"
+        # print("restarting")
         os.execvpe(argv[0], argv, dict(os.environ))
     <BLANKLINE>
     del argv
@@ -3074,7 +3075,7 @@ as well as a "script" option.
     <BLANKLINE>
     os.environ['ZC_DEBUG_LOGGING'] = 'on'
     <BLANKLINE>
-    # print "starting debugzope..."
+    # print("starting debugzope...")
     execfile(debugzope)
 
 Paste-deployment support
@@ -3126,7 +3127,7 @@ paste-based instance start scripts.
 
 .. test
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling run-foo.
@@ -3266,7 +3267,7 @@ server configuration yourself, you can provide a paste.init option::
 
 .. test
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
