@@ -1169,6 +1169,7 @@ in the buildout bin directory:
     <BLANKLINE>
     import sys
     sys.path[0:0] = [
+      '/site-packages',
       '/zc.zope3recipes',
       ]
     <BLANKLINE>

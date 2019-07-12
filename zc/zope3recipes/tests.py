@@ -300,7 +300,6 @@ def test_suite():
     optionflags = (
         doctest.NORMALIZE_WHITESPACE
         | doctest.ELLIPSIS
-        | doctest.REPORT_ONLY_FIRST_FAILURE
         | doctest.REPORT_NDIFF
     )
     if sys.platform[:3].lower() == "win":
