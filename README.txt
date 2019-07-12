@@ -27,6 +27,8 @@ Releases
 - Fix TypeError: <lambda>() takes no arguments (1 given) on Windows
   with zdaemon >= 3.0.0.
 
+- Support Python 3.5 through 3.7.
+
 
 ===================
 0.18.0 (2013/02/05)

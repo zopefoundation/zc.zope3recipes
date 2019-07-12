@@ -12,6 +12,8 @@
 #
 ##############################################################################
 
+from __future__ import print_function
+
 import doctest
 import os
 import re
@@ -31,12 +33,12 @@ def ls_optional(dir, ignore=(), *subs):
         if name in ignore:
             continue
         if os.path.isdir(os.path.join(dir, name)):
-            print 'd ',
+            print('d ', end='')
         elif os.path.islink(os.path.join(dir, name)):
-            print 'l ',
+            print('l ', end='')
         else:
-            print '- ',
-        print name
+            print('- ', end='')
+        print(name)
 
 
 def test_ctl():
@@ -58,7 +60,7 @@ ordinary script:
     ... scripts = ctl
     ... ''')
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')), end='')
     Installing ctl...
     Generated script '/sample-buildout/bin/ctl'.
 
@@ -77,7 +79,7 @@ Unlike a normal zdaemon script, we have to pass two extra arguments, a
 script to run the zope debugger with, and the name of a zope
 configuration file. For demonstration purposes, we'll just use echo.
 
-    >>> print system(join('bin', 'ctl')+' echo zope.conf -Cconf fg there'),
+    >>> print(system(join('bin', 'ctl')+' echo zope.conf -Cconf fg there'), end='')
     echo hi there
     hi there
 
@@ -92,16 +94,17 @@ Notice:
 Now, if we use the run command, it will run the script we passed as
 the first argument:
 
-    >>> print system(join('bin', 'ctl')+' echo zope.conf -Cconf run there'),
+    >>> print(system(join('bin', 'ctl')+' echo zope.conf -Cconf run there'), end='')
     -C zope.conf there
 
 debug is another name for run:
 
-    >>> print system(join('bin', 'ctl')+' echo zope.conf -Cconf debug there'),
+    >>> print(system(join('bin', 'ctl')+' echo zope.conf -Cconf debug there'), end='')
     -C zope.conf there
 
 
 """
+
 
 def test_sane_errors_from_recipe():
     """
@@ -124,13 +127,14 @@ There was a bug in the recipe error handling that caused errors to be hidden
     ... zope.conf =
     ... ''')
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')), end='')
     Couldn't find index page for 'zc.recipe.egg' (maybe misspelled?)
     Installing instance.
     While:
       Installing instance.
     Error: No database sections have been defined.
     """
+
 
 def work_with_old_zc_deployment():
     """
@@ -196,7 +200,7 @@ def work_with_old_zc_deployment():
     ... user = zope
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')), end='')
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Installing database.
@@ -207,6 +211,7 @@ def work_with_old_zc_deployment():
     Generated script '/root/etc/init.d/myapp-run-instance'.
 
     """
+
 
 def setUp(test):
     zc.buildout.testing.buildoutSetUp(test)
@@ -227,8 +232,11 @@ def setUp(test):
     if not os.path.exists(conf_dir):
         os.makedirs(conf_dir)
     if not os.path.exists(conf_file):
-        open(conf_file, 'w').write("[buildout]\n"
-                                   "newest = false")
+        with open(conf_file, 'w') as fp:
+            fp.write(
+                "[buildout]\n"
+                "newest = false\n"
+            )
     else:
         raise RuntimeWarning('Unable to set "newest=false" for tests')
 
@@ -236,9 +244,9 @@ def setUp(test):
 checker = renormalizing.RENormalizing([
     zc.buildout.testing.normalize_path,
     (re.compile(
-    "Couldn't find index page for '[a-zA-Z0-9.]+' "
-    "\(maybe misspelled\?\)"
-    "\n"
+        r"Couldn't find index page for '[a-zA-Z0-9.]+' "
+        r"\(maybe misspelled\?\)"
+        r"\n"
     ), ''),
     # Windows
     (re.compile(r'\r\n'), '\n'),
@@ -251,21 +259,19 @@ checker = renormalizing.RENormalizing([
     (re.compile("""['"][^\n"']+site-packages['"],"""),
      "'/site-packages',"),
     (re.compile('#![^\n]+\n'), ''),
-    (re.compile('-[^-]+-py\d[.]\d(-\S+)?.egg'),
-     '-pyN.N.egg',
-    ),
+    (re.compile(r'-[^-]+-py\d[.]\d(-\S+)?.egg'),
+     '-pyN.N.egg'),
     # Turn "distribute" into "setuptools" so the tests can pass with either:
     (re.compile(r'\bdistribute-pyN\.N\.egg'),
-     'setuptools-pyN.N.egg',
-    ),
+     'setuptools-pyN.N.egg'),
     # Sometimes buildout decides to also install six
     (re.compile(
-    r"Getting distribution for 'six'\.\nGot six [0-9.]+\.\n"
+        r"Getting distribution for 'six'\.\nGot six [0-9.]+\.\n"
     ), ''),
     # Running the tests under coverage changes the output ordering!  This makes
     # no sense!
     (re.compile(
-    r"( *'/zope3recipes',\n)( *'/sample-buildout/demo1',\n)"
+        r"( *'/zope3recipes',\n)( *'/sample-buildout/demo1',\n)"
     ), r'\2\1'),
     # Running the tests with buildout + bin/test adds ZConfig and zdaemon
     # eggs to sys.path of generated tests.  Running the tests with tox does
@@ -303,22 +309,33 @@ def test_suite():
         | doctest.REPORT_NDIFF
     )
     if sys.platform[:3].lower() == "win":
-        suite.addTest(doctest.DocFileSuite('WINDOWS.txt',
-                 setUp=setUp,
-                 tearDown=zc.buildout.testing.buildoutTearDown,
-                 checker=checker,
-                 optionflags=optionflags))
+        suite.addTest(
+            doctest.DocFileSuite(
+                'WINDOWS.txt',
+                setUp=setUp,
+                tearDown=zc.buildout.testing.buildoutTearDown,
+                checker=checker,
+                optionflags=optionflags,
+            )
+        )
     else:
-        suite.addTest(doctest.DocTestSuite(
-            setUp=setUp,
-            tearDown=zc.buildout.testing.buildoutTearDown,
-            checker=checker,
-            optionflags=optionflags))
-        suite.addTest(doctest.DocFileSuite('README.txt',
-            setUp=setUp,
-            tearDown=zc.buildout.testing.buildoutTearDown,
-            checker=checker,
-            optionflags=optionflags))
+        suite.addTest(
+            doctest.DocTestSuite(
+                setUp=setUp,
+                tearDown=zc.buildout.testing.buildoutTearDown,
+                checker=checker,
+                optionflags=optionflags,
+            )
+        )
+        suite.addTest(
+            doctest.DocFileSuite(
+                'README.txt',
+                setUp=setUp,
+                tearDown=zc.buildout.testing.buildoutTearDown,
+                checker=checker,
+                optionflags=optionflags,
+            )
+        )
 
     return suite
 

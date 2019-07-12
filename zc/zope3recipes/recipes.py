@@ -14,17 +14,19 @@
 """Collected Zope 3 recipes
 """
 
-import cStringIO
 import logging
 import os
-import pkg_resources
 import pprint
 import re
 import shutil
 import sys
-import zc.buildout
+
 import ZConfig.schemaless
+import pkg_resources
+import six
+import zc.buildout
 import zc.recipe.egg
+
 
 this_loc = pkg_resources.working_set.find(
     pkg_resources.Requirement.parse('zc.zope3recipes')).location
@@ -126,9 +128,9 @@ class Application(object):
             zc.buildout.easy_install.scripts(
                 [('debugzope', 'zc.zope3recipes.debugzope', 'debug')],
                 ws, get_executable(options), dest,
-                extra_paths = options['extra-paths'].split(),
-                initialization = initialization,
-                arguments = arguments,
+                extra_paths=options['extra-paths'].split(),
+                initialization=initialization,
+                arguments=arguments,
                 relative_paths=self.egg._relative_paths,
                 )
 
@@ -141,7 +143,7 @@ class Application(object):
 
             return dest
 
-        except:
+        except Exception:
             if created:
                 shutil.rmtree(dest)
             raise
@@ -150,6 +152,7 @@ class Application(object):
 
     def update(self):
         self.install()
+
 
 class App(Application):
 
@@ -191,6 +194,7 @@ class App(Application):
 
         return super(App, self).install()
 
+
 site_zcml_template = """\
 <configure xmlns='http://namespaces.zope.org/zope'
            xmlns:meta="http://namespaces.zope.org/meta"
@@ -198,6 +202,7 @@ site_zcml_template = """\
 %s
 </configure>
 """
+
 
 class Instance:
 
@@ -249,7 +254,7 @@ class Instance:
             zdaemon_conf_path = os.path.join(options['etc-directory'],
                                              self.name+'-zdaemon.conf')
             paste_ini_path = os.path.join(options['etc-directory'],
-                                             self.name+'-paste.ini')
+                                          self.name+'-paste.ini')
             event_log_path = os.path.join(options['log-directory'],
                                           self.name+'-z3.log')
             access_log_path = os.path.join(options['log-directory'],
@@ -263,7 +268,7 @@ class Instance:
                         os.path.join(options['bin-directory'], rc),
                         ]
             logrotate_conf = options.get("logrotate.conf")
-            if isinstance(logrotate_conf, basestring):
+            if isinstance(logrotate_conf, six.string_types):
                 if logrotate_conf.strip():
                     creating.append(logrotate_path)
                 else:
@@ -294,7 +299,7 @@ class Instance:
 
             zope_conf = options.get('zope.conf', '')+'\n'
             zope_conf = ZConfig.schemaless.loadConfigFile(
-                cStringIO.StringIO(zope_conf))
+                six.StringIO(zope_conf))
 
             if 'site-definition' not in zope_conf:
                 zope_conf['site-definition'] = [
@@ -318,7 +323,7 @@ class Instance:
                             data=dict(type=[server_type], address=['8080']))
                         )
                 program_args = '-C '+zope_conf_path
-            else: # paste
+            else:  # paste
                 paste_ini = options.get('paste.ini', '')
                 if not paste_ini:
                     address = options.get('address', '8080').split()
@@ -330,7 +335,7 @@ class Instance:
                     if ':' in address:
                         host, port = address.rsplit(':', 1)
                         port = int(port)
-                    elif re.match('\d+$', address):
+                    elif re.match(r'\d+$', address):
                         host = ''
                         port = int(address)
                     else:
@@ -370,7 +375,6 @@ class Instance:
 
                 program_args = paste_ini_path
 
-
             if not [s for s in zope_conf.sections if s.type == 'zodb']:
                 raise zc.buildout.UserError(
                     'No database sections have been defined.')
@@ -378,7 +382,7 @@ class Instance:
             if not [s for s in zope_conf.sections if s.type == 'accesslog']:
                 zope_conf.sections.append(access_log(access_log_path))
 
-            if not server_type: # paste
+            if not server_type:  # paste
                 for s in zope_conf.sections:
                     if s.type != 'accesslog':
                         continue
@@ -393,10 +397,9 @@ class Instance:
             if not [s for s in zope_conf.sections if s.type == 'eventlog']:
                 zope_conf.sections.append(event_log('STDOUT'))
 
-
             zdaemon_conf = options.get('zdaemon.conf', '')+'\n'
             zdaemon_conf = ZConfig.schemaless.loadConfigFile(
-                cStringIO.StringIO(zdaemon_conf))
+                six.StringIO(zdaemon_conf))
 
             defaults = {
                 'program': "%s %s" % (os.path.join(app_loc, 'runzope'),
@@ -404,7 +407,7 @@ class Instance:
                 'daemon': 'on',
                 'transcript': event_log_path,
                 'socket-name': socket_path,
-                'directory' : run_directory,
+                'directory': run_directory,
                 }
             if deployment:
                 defaults['user'] = options['user']
@@ -501,7 +504,7 @@ class Instance:
 
             return creating
 
-        except:
+        except Exception:
             for f in creating:
                 if os.path.isdir(f):
                     shutil.rmtree(f)
@@ -509,14 +512,15 @@ class Instance:
                     os.remove(f)
             raise
 
-
     update = install
+
 
 def access_log(path):
     return ZConfig.schemaless.Section(
         'accesslog', '',
         sections=[ZConfig.schemaless.Section('logfile', '', dict(path=[path]))]
         )
+
 
 def event_log(path, *data):
     return ZConfig.schemaless.Section(
@@ -526,6 +530,7 @@ def event_log(path, *data):
              '',
              dict(path=[path], formatter=['zope.exceptions.log.Formatter'])),
          ])
+
 
 def event_log2(path, *data):
     return ZConfig.schemaless.Section(
@@ -634,7 +639,7 @@ class ZopeConf(SupportingBase):
 
         zope_conf = options.get('text', '')+'\n'
         zope_conf = ZConfig.schemaless.loadConfigFile(
-            cStringIO.StringIO(zope_conf))
+            six.StringIO(zope_conf))
 
         if "access-log" in options:
             access_log_name = options["access-log"]
@@ -648,7 +653,7 @@ class ZopeConf(SupportingBase):
         # path; this (and the windows case) are handled specially so the
         # file can be dumped to /dev/null for offline scripts.
         if (os.path.isabs(access_log_name)
-            or (WIN and access_log_name.upper() == "NUL")):
+                or (WIN and access_log_name.upper() == "NUL")):
             access_log_path = access_log_name
         elif self.deployment:
             access_log_path = os.path.join(
@@ -717,7 +722,7 @@ class Offline(SupportingBase):
             self.environment = {}
         options["executable"] = get_executable(self.app)
         zope_conf = buildout[options["zope.conf"]]
-        options["zope.conf-location"] =  zope_conf["location"]
+        options["zope.conf-location"] = zope_conf["location"]
         script = options.get("script")
         if script:
             script = os.path.join(buildout["buildout"]["directory"], script)
@@ -749,8 +754,9 @@ class Offline(SupportingBase):
         f = open(dest, "w")
         f.write(script_content)
         f.close()
-        os.chmod(dest, 0775)
+        os.chmod(dest, 0o775)
         return [dest]
+
 
 template = '''\
 #!%(executable)s
@@ -768,7 +774,7 @@ if %(user)r:
     if pwd.getpwnam(%(user)r).pw_uid != os.geteuid():
         restart = True
         argv[:0] = ["sudo", "-u", %(user)r]
-        # print "switching to user", %(user)r
+        # print("switching to user %%s" %% %(user)r)
     del pwd
 
 for k in env:
@@ -778,7 +784,7 @@ for k in env:
     del k
 
 if restart:
-    # print "restarting"
+    # print("restarting")
     os.execvpe(argv[0], argv, dict(os.environ))
 
 del argv
@@ -789,7 +795,7 @@ sys.argv[1:1] = [
     "-C",
     %(config)r,
     %(script)s
-    ]
+]
 
 debugzope = %(debugzope)r
 globals()["__file__"] = debugzope
@@ -799,6 +805,7 @@ zeo_logger.addHandler(logging.StreamHandler())
 
 %(initialization)s
 
-# print "starting debugzope..."
-execfile(debugzope)
+# print("starting debugzope...")
+with open(debugzope) as f:
+    exec(f.read())
 '''

@@ -58,7 +58,7 @@ We'll create a buildout.cfg file that defines our application:
 
 Now, Let's run the buildout and see what we get:
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Installing myapp.
@@ -159,7 +159,7 @@ the zope namespace.  A configure directive will be included for us.
 
 Let's run the buildout and see what we get:
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling myapp.
@@ -297,7 +297,7 @@ explicit:
     ... eggs = demo2
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Updating myapp.
@@ -352,7 +352,7 @@ We can also specify the ZServer servers explicitly:
     ... eggs = demo2
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling myapp.
@@ -462,7 +462,7 @@ If we modify our buildout to include an ftesting.zcml option:
     ... eggs = demo2
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling myapp.
@@ -603,7 +603,7 @@ instance part.
 
 Let's run the buildout, and see what we get:
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling myapp.
@@ -698,7 +698,7 @@ the names of the server types are adjusted appropriately:
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -777,7 +777,7 @@ The Twisted-based servers can also be specified explicitly:
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -869,7 +869,7 @@ If we specify a server section ourselves:
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -945,7 +945,7 @@ the address option which accepts zero or more address specifications:
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -1033,7 +1033,7 @@ access log:
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -1133,7 +1133,7 @@ simply provide a zdaemon.conf option in your instance section:
     ... recipe = zc.recipe.filestorage
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -1235,7 +1235,7 @@ which they're give in the input::
     ...
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -1385,7 +1385,7 @@ Here we've added a deployment section, myapp-run, and added a
 deployment option to our instance part telling the instance recipe to
 use the deployment.  If we rerun the buildout:
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -1548,7 +1548,7 @@ Let's update our buildout to add a new instance:
     ... user = zope
     ... ''' % globals())
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Develop: '/sample-buildout/demo1'
     Develop: '/sample-buildout/demo2'
     Uninstalling instance.
@@ -1614,7 +1614,7 @@ ordinary script:
     ... scripts = winctl
     ... ''')
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Uninstalling instance2.
     Uninstalling instance.
     Uninstalling myapp.
@@ -1644,7 +1644,7 @@ confPath = os.path.abspath(conf)
     >>> conf = join(sample_buildout, 'conf')
     >>> echo = join(sample_buildout, 'doecho.bat')
     >>> cmd = '%s %s zope.conf -C%s fg there' % (join('bin', 'winctl'), echo, conf)
-    >>> print system(cmd) #doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+    >>> print(system(cmd)) #doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
     <BLANKLINE>
     /sample-buildout>echo hi there
     hi there
@@ -1663,7 +1663,7 @@ Now, if we use the run command, it will run the script we passed as
 the first argument:
 
     >>> cmd = '%s %s zope.conf -C%s run there' % (join('bin', 'winctl'), echo, conf)
-    >>> print system(cmd) #doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+    >>> print(system(cmd)) #doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
     <BLANKLINE>
     /sample-buildout>echo -C zope.conf there
     -C zope.conf there
@@ -1674,7 +1674,7 @@ the first argument:
 debug is another name for run:
 
     >>> cmd = '%s %s zope.conf -C%s debug there' % (join('bin', 'winctl'), echo, conf)
-    >>> print system(cmd) #doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+    >>> print(system(cmd)) #doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
     <BLANKLINE>
     /sample-buildout>echo -C zope.conf there
     -C zope.conf there
@@ -1702,7 +1702,7 @@ test_sane_errors_from_recipe
     ... zope.conf =
     ... ''')
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print(system(join('bin', 'buildout')))
     Couldn't find index page for 'zc.recipe.egg' (maybe misspelled?)
     Uninstalling winctl.
     Installing instance.

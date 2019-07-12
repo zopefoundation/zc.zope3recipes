@@ -12,15 +12,18 @@
 #
 ##############################################################################
 """Zope 3 program entry points
-
-$Id$
 """
 
-import os, sys, traceback
+import os
+import sys
+import traceback
+
+import six
 import zope.app.debug
 import zope.app.appsetup.interfaces
-from zope.event import notify
 import zope.app.appsetup.product
+from zope.event import notify
+
 
 def load_options(args, main_module=None):
     options = main_module.ZopeOptions()
@@ -44,15 +47,13 @@ def zglobals(options):
     startup = os.environ.get("PYTHONSTARTUP")
     if startup:
         try:
-            f = open(startup)
+            with open(startup) as f:
+                globs["__file__"] = startup
+                six.exec_(f.read(), globs)
+                del globs["__file__"]
         except (OSError, IOError):
             # Not readable or not there, which is allowed.
             pass
-        else:
-            f.close()
-            globs["__file__"] = startup
-            execfile(startup, globs, globs)
-            del globs["__file__"]
 
     app = zope.app.debug.Debugger.fromDatabase(db)
     globs["app"] = app
@@ -60,6 +61,7 @@ def zglobals(options):
     globs["root"] = app.root()
 
     return globs
+
 
 def debug(args=None, main_module=None):
     if args is None:
@@ -70,7 +72,7 @@ def debug(args=None, main_module=None):
         options.configroot.eventlog.startup()
     try:
         globs = zglobals(options.configroot)
-    except:
+    except Exception:
         if options.args:
             raise
         else:
@@ -79,17 +81,18 @@ def debug(args=None, main_module=None):
             pdb.post_mortem(sys.exc_info()[2])
             return
 
-
     args = options.args
 
     if args:
         sys.argv[:] = args
         globs['__file__'] = sys.argv[0]
-        execfile(sys.argv[0], globs)
+        with open(sys.argv[0]) as f:
+            six.exec_(f.read(), globs)
         sys.exit()
     else:
         import code
         code.interact(banner=banner, local=globs)
+
 
 banner = """Welcome to the Zope 3 "debugger".
 The application root object is available as the root variable.
