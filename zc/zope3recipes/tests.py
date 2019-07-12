@@ -241,7 +241,7 @@ checker = renormalizing.RENormalizing([
     "\n"
     ), ''),
     # this directory
-    (re.compile(r"""['"][^\n"']+zc\.zope3recipes['"],"""),
+    (re.compile(r"""['"][^\n"']+zc.zope3recipes['"],"""),
      "'/zc.zope3recipes',"),
     # welp, when we do things like `tox -e coverage`, everything's in
     # .tox/coverage/lib/pythonX.Y/site-packages and that's what gets added to
