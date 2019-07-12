@@ -34,16 +34,16 @@ setup(
     keywords="zope3 buildout",
     url='https://github.com/zopefoundation/%s' % name,
     long_description=(
-        read('README.txt')
+        read('README.rst')
         + '\n' +
-        'Detailed Documentation\n'
-        '**********************\n'
+        read('CHANGES.rst')
         + '\n' +
-        read('zc', 'zope3recipes', 'README.txt')
+        '========================\n'
+        ' Detailed Documentation\n'
+        '========================\n'
         + '\n' +
-        'Download\n'
-        '**********************\n'
-        ),
+        read('zc', 'zope3recipes', 'README.rst').split('\n\n', 1)[1]
+    ),
     packages=find_packages('.'),
     include_package_data=True,
     namespace_packages=['zc'],
