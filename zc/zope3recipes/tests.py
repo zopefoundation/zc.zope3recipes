@@ -277,6 +277,13 @@ checker = renormalizing.RENormalizing([
     (re.compile(
         r"( *'/sample-buildout/eggs/(PasteScript|six|PasteDeploy|Paste)-pyN.N.egg',\n)+"
     ), "  '/site-packages',\n"),
+    # tox -e coverage does this!  I've no idea why!
+    (re.compile(
+        r"Uninstalling myapp.\n"
+        r"(Updating database.\n|)"
+        r"Installing myapp.\n"
+        r"(Generated script '/sample-buildout/parts/myapp/[^']+'\.\n)*",
+    ), "Updating myapp.\n\\1"),
 ])
 
 
