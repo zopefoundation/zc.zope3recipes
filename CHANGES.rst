@@ -5,7 +5,7 @@
 0.19.1 (unreleased)
 ===================
 
-- Nothing changed yet.
+- Add support for Python 3.8.
 
 
 0.19.0 (2019-07-12)
