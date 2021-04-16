@@ -87,7 +87,8 @@ def debug(args=None, main_module=None):
         sys.argv[:] = args
         globs['__file__'] = sys.argv[0]
         with open(sys.argv[0]) as f:
-            six.exec_(f.read(), globs)
+            code = compile(f.read(), sys.argv[0], 'exec')
+            six.exec_(code, globs)
         sys.exit()
     else:
         import code

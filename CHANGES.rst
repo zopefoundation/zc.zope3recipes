@@ -7,6 +7,8 @@
 
 - Add support for Python 3.8.
 
+- Fix using the debugger inside a script called by debugzope.py.
+
 
 0.19.0 (2019-07-12)
 ===================
