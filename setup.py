@@ -16,7 +16,7 @@ import os
 from setuptools import setup, find_packages
 
 name = "zc.zope3recipes"
-version = "0.19.1.dev0"
+version = "0.20.0"
 
 
 def read(*rnames):
