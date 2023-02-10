@@ -2,8 +2,8 @@
  Releases
 ==========
 
-0.20.1 (unreleased)
-===================
+1.0 (unreleased)
+================
 
 - Nothing changed yet.
 
