@@ -1,27 +1,35 @@
-version: build-{build}-{branch}
-
+# Generated from:
+# https://github.com/zopefoundation/meta/tree/master/config/buildout-recipe
 environment:
-  matrix:
-    # https://www.appveyor.com/docs/installed-software#python lists available
-    # versions
-    - PYTHON: "C:\\Python27"
-    - PYTHON: "C:\\Python35"
-    - PYTHON: "C:\\Python36"
-    - PYTHON: "C:\\Python37"
-    - PYTHON: "C:\\Python38"
 
-init:
-  - "echo %PYTHON%"
+  matrix:
+    - python: 37-x64
+    - python: 38-x64
+    - python: 39-x64
+    - python: 310-x64
+    - python: 311-x64
 
 install:
-  - "set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-  - python --version
-  # Upgrade virtualenv because the one in the Appveyor image is old and has an
-  # old bundled pip version that thinks 'zc.recipe.egg' is an egg.
-  - pip install -U virtualenv
-  - pip install tox
+  - "SET PYTHONVERSION=%PYTHON%"
+  - "SET PATH=C:\\Python%PYTHON%;c:\\Python%PYTHON%\\scripts;%PATH%"
+  - ps: |
+      $env:PYTHON = "C:\\Python${env:PYTHON}"
+      if (-not (Test-Path $env:PYTHON)) {
+        curl -o install_python.ps1 https://raw.githubusercontent.com/matthew-brett/multibuild/11a389d78892cf90addac8f69433d5e22bfa422a/install_python.ps1
+        .\install_python.ps1
+      }
+  - ps: if (-not (Test-Path $env:PYTHON)) { throw "No $env:PYTHON" }
+  - echo "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 > "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64\vcvars64.bat"
+  - python -m pip install -U pip
+  - pip install -U setuptools wheel
+  - pip install -U -e .[test]
 
-build: off
+matrix:
+  fast_finish: true
+
+build: false
 
 test_script:
-  - tox -e py
+  - zope-testrunner --test-path=src
+on_success:
+  - echo Build succesful!
