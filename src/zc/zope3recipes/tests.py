@@ -12,7 +12,6 @@
 #
 ##############################################################################
 
-from __future__ import print_function
 
 import doctest
 import os
@@ -263,10 +262,6 @@ checker = renormalizing.RENormalizing([
     # Turn "distribute" into "setuptools" so the tests can pass with either:
     (re.compile(r'\bdistribute-pyN\.N\.egg'),
      'setuptools-pyN.N.egg'),
-    # Sometimes buildout decides to also install six
-    (re.compile(
-        r"Getting distribution for 'six'\.\nGot six [0-9.]+\.\n"
-    ), ''),
     # Running the tests under coverage changes the output ordering!  This makes
     # no sense!
     (re.compile(
@@ -282,7 +277,7 @@ checker = renormalizing.RENormalizing([
         r" *join\(base, 'eggs/(ZConfig|zdaemon)-pyN.N.egg'\),\n"
     ), ''),
     (re.compile(
-        r"( *'/sample-buildout/eggs/(PasteScript|six|"
+        r"( *'/sample-buildout/eggs/(PasteScript|"
         r"PasteDeploy|Paste)-pyN.N.egg',\n)+"
     ), "  '/site-packages',\n"),
     # tox -e coverage does this!  I've no idea why!

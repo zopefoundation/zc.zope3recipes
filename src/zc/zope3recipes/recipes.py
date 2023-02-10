@@ -14,6 +14,7 @@
 """Collected Zope 3 recipes
 """
 
+import io
 import logging
 import os
 import pprint
@@ -22,7 +23,6 @@ import shutil
 import sys
 
 import pkg_resources
-import six
 
 import zc.buildout
 import zc.recipe.egg
@@ -49,7 +49,7 @@ def get_executable(section):
     return section.get("executable") or sys.executable
 
 
-class Application(object):
+class Application:
 
     def __init__(self, buildout, name, options):
         self.options = options
@@ -158,7 +158,7 @@ class Application(object):
 class App(Application):
 
     def __init__(self, buildout, name, options):
-        super(App, self).__init__(buildout, name, options)
+        super().__init__(buildout, name, options)
 
         location = buildout[options.get('zope3', 'zope3')]['location']
         if location:
@@ -193,7 +193,7 @@ class App(Application):
                 extra = path
             options['extra-paths'] = extra
 
-        return super(App, self).install()
+        return super().install()
 
 
 site_zcml_template = """\
@@ -269,7 +269,7 @@ class Instance:
                         os.path.join(options['bin-directory'], rc),
                         ]
             logrotate_conf = options.get("logrotate.conf")
-            if isinstance(logrotate_conf, six.string_types):
+            if isinstance(logrotate_conf, str):
                 if logrotate_conf.strip():
                     creating.append(logrotate_path)
                 else:
@@ -300,7 +300,7 @@ class Instance:
 
             zope_conf = options.get('zope.conf', '')+'\n'
             zope_conf = ZConfig.schemaless.loadConfigFile(
-                six.StringIO(zope_conf))
+                io.StringIO(zope_conf))
 
             if 'site-definition' not in zope_conf:
                 zope_conf['site-definition'] = [
@@ -400,11 +400,11 @@ class Instance:
 
             zdaemon_conf = options.get('zdaemon.conf', '')+'\n'
             zdaemon_conf = ZConfig.schemaless.loadConfigFile(
-                six.StringIO(zdaemon_conf))
+                io.StringIO(zdaemon_conf))
 
             defaults = {
-                'program': "%s %s" % (os.path.join(app_loc, 'runzope'),
-                                      program_args),
+                'program': "{} {}".format(os.path.join(app_loc, 'runzope'),
+                                          program_args),
                 'daemon': 'on',
                 'transcript': event_log_path,
                 'socket-name': socket_path,
@@ -603,7 +603,7 @@ ftesting_base = """
 """
 
 
-class SupportingBase(object):
+class SupportingBase:
 
     def __init__(self, buildout, name, options):
         self.options = options
@@ -622,7 +622,7 @@ class SupportingBase(object):
 class ZopeConf(SupportingBase):
 
     def __init__(self, buildout, name, options):
-        super(ZopeConf, self).__init__(buildout, name, options)
+        super().__init__(buildout, name, options)
         if self.deployment:
             options['run-directory'] = self.deployment['run-directory']
             zope_conf_path = os.path.join(
@@ -640,7 +640,7 @@ class ZopeConf(SupportingBase):
 
         zope_conf = options.get('text', '')+'\n'
         zope_conf = ZConfig.schemaless.loadConfigFile(
-            six.StringIO(zope_conf))
+            io.StringIO(zope_conf))
 
         if "access-log" in options:
             access_log_name = options["access-log"]
@@ -706,7 +706,7 @@ class ZopeConf(SupportingBase):
 class Offline(SupportingBase):
 
     def __init__(self, buildout, name, options):
-        super(Offline, self).__init__(buildout, name, options)
+        super().__init__(buildout, name, options)
         if "directory" not in options:
             if self.deployment is None:
                 directory = buildout["buildout"]["bin-directory"]

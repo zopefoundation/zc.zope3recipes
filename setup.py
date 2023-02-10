@@ -31,7 +31,7 @@ setup(
     name=name,
     version=version,
     author="Jim Fulton",
-    author_email="jim@zope.com",
+    author_email="zope-dev@zope.dev",
     description="ZC Buildout recipe for defining Zope 3 applications",
     license="ZPL 2.1",
     keywords="zope3 buildout",
@@ -51,8 +51,8 @@ setup(
     package_dir={'': 'src'},
     include_package_data=True,
     namespace_packages=['zc'],
+    python_requires='>=3.7',
     install_requires=[
-        'six',
         'zc.buildout >= 1.2.0',
         'zope.testing',
         'setuptools',
