@@ -19,9 +19,10 @@ import sys
 import traceback
 
 import six
-import zope.app.debug
+
 import zope.app.appsetup.interfaces
 import zope.app.appsetup.product
+import zope.app.debug
 from zope.event import notify
 
 

@@ -13,7 +13,10 @@
 ##############################################################################
 
 import os
-from setuptools import setup, find_packages
+
+from setuptools import find_packages
+from setuptools import setup
+
 
 name = "zc.zope3recipes"
 version = "0.20.1.dev0"
@@ -42,9 +45,10 @@ setup(
         ' Detailed Documentation\n'
         '========================\n'
         + '\n' +
-        read('zc', 'zope3recipes', 'README.rst').split('\n\n', 1)[1]
+        read('src', 'zc', 'zope3recipes', 'README.rst').split('\n\n', 1)[1]
     ),
-    packages=find_packages('.'),
+    packages=find_packages('src'),
+    package_dir={'': 'src'},
     include_package_data=True,
     namespace_packages=['zc'],
     install_requires=[
@@ -65,7 +69,7 @@ setup(
          ],
     },
     extras_require=dict(
-        tests=[
+        test=[
             'zdaemon >= 3.0.0',
             'zc.recipe.filestorage',
             'PasteScript',

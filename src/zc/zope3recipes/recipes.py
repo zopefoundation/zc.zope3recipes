@@ -21,11 +21,12 @@ import re
 import shutil
 import sys
 
-import ZConfig.schemaless
 import pkg_resources
 import six
+
 import zc.buildout
 import zc.recipe.egg
+import ZConfig.schemaless
 
 
 this_loc = pkg_resources.working_set.find(
