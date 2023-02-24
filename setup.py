@@ -58,6 +58,7 @@ setup(
         'setuptools',
         'zc.recipe.egg >= 1.2.0',
         'ZConfig >= 2.4a5',
+        "pywin32 ; platform_system=='Windows'",
     ],
     entry_points={
         'zc.buildout': [
