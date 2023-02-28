@@ -2,14 +2,14 @@
 # https://github.com/zopefoundation/meta/tree/master/config/buildout-recipe
 [meta]
 template = "buildout-recipe"
-commit-id = "f0962ac8"
+commit-id = "039702ef"
 
 [python]
 with-sphinx-doctests = false
 with-future-python = false
 with-pypy = false
 with-macos = false
-with-windows = true
+with-windows = false
 
 [tox]
 use-flake8 = true
