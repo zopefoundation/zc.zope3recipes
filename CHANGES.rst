@@ -9,6 +9,8 @@
 
 - Drop support for Python 2.7, 3.5, 3.6.
 
+- Drop Windows support due to lack of maintainer interest.
+
 
 0.20.0 (2021-04-16)
 ===================
