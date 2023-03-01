@@ -19,7 +19,7 @@ from setuptools import setup
 
 
 name = "zc.zope3recipes"
-version = "1.0"
+version = "1.1.dev0"
 
 
 def read(*rnames):
