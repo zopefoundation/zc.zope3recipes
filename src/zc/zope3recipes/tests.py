@@ -12,7 +12,6 @@
 #
 ##############################################################################
 
-from __future__ import print_function
 
 import doctest
 import os
@@ -102,8 +101,7 @@ debug is another name for run:
     >>> print(system(join('bin', 'ctl')+' echo zope.conf -Cconf debug there'), end='')
     -C zope.conf there
 
-
-"""
+"""  # noqa: E501 line too long
 
 
 def test_sane_errors_from_recipe():
@@ -264,10 +262,6 @@ checker = renormalizing.RENormalizing([
     # Turn "distribute" into "setuptools" so the tests can pass with either:
     (re.compile(r'\bdistribute-pyN\.N\.egg'),
      'setuptools-pyN.N.egg'),
-    # Sometimes buildout decides to also install six
-    (re.compile(
-        r"Getting distribution for 'six'\.\nGot six [0-9.]+\.\n"
-    ), ''),
     # Running the tests under coverage changes the output ordering!  This makes
     # no sense!
     (re.compile(
@@ -283,12 +277,14 @@ checker = renormalizing.RENormalizing([
         r" *join\(base, 'eggs/(ZConfig|zdaemon)-pyN.N.egg'\),\n"
     ), ''),
     (re.compile(
-        r"( *'/sample-buildout/eggs/(PasteScript|six|PasteDeploy|Paste)-pyN.N.egg',\n)+"
+        r"( *'/sample-buildout/eggs/(PasteScript|"
+        r"PasteDeploy|Paste)-pyN.N.egg',\n)+"
     ), "  '/site-packages',\n"),
     # tox -e coverage does this!  I've no idea why!
     (re.compile(
         r"Uninstalling myapp.\n"
-        r"(Updating database.\n|Installing database.\n|Uninstalling database.\n|)"
+        r"(Updating database.\n|Installing database.\n"
+        r"|Uninstalling database.\n|)"
         r"Installing myapp.\n"
         r"(Generated script '/sample-buildout/parts/myapp/[^']+'\.\n)*",
     ), "\\1Updating myapp.\n"),
@@ -298,6 +294,11 @@ checker = renormalizing.RENormalizing([
         r"Installing instance.\n"
         r"(Generated script '/sample-buildout/bin/[^']+'\.\n)*",
     ), "\\1Updating instance.\n"),
+    # Ignore Setuptools deprecation warnings for now:
+    (re.compile(r'.*EasyInstallDeprecationWarning.*\n'), ''),
+    (re.compile(r'.*SetuptoolsDeprecationWarning.*\n'), ''),
+    # Ignore warnings for Python <= 3.10:
+    (re.compile(r'.*warnings.warn\(\n'), ''),
 ])
 
 
@@ -338,7 +339,3 @@ def test_suite():
         )
 
     return suite
-
-
-if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite')

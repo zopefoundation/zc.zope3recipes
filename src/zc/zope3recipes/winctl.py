@@ -14,19 +14,22 @@
 """Top-level controller for 'zopectl'.
 """
 
-import sys
-import subprocess
 import errno
+import subprocess
+import sys
 
 import zdaemon.zdctl
 
+
 if sys.platform[:3].lower() == "win":
+    import msvcrt
+
     import win32api
     import win32com.client
     import win32process
-    from win32file import ReadFile, WriteFile
+    from win32file import ReadFile
+    from win32file import WriteFile
     from win32pipe import PeekNamedPipe
-    import msvcrt
 
 
 def getChildrenPidsOfPid(pid):
@@ -44,7 +47,8 @@ def getChildrenPidsOfPid(pid):
 def getDaemonProcess(pid):
     """Returns the daemon proces."""
     wmi = win32com.client.GetObject('winmgmts:')
-    children = wmi.ExecQuery('Select * from win32_process where ProcessId=%s' % pid)
+    children = wmi.ExecQuery(
+        'Select * from win32_process where ProcessId=%s' % pid)
     pids = []
     for proc in children:
         pids.append(proc.Properties_('ProcessId'))

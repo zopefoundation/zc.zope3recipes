@@ -13,10 +13,13 @@
 ##############################################################################
 
 import os
-from setuptools import setup, find_packages
+
+from setuptools import find_packages
+from setuptools import setup
+
 
 name = "zc.zope3recipes"
-version = "0.20.1.dev0"
+version = "1.0.dev0"
 
 
 def read(*rnames):
@@ -28,7 +31,7 @@ setup(
     name=name,
     version=version,
     author="Jim Fulton",
-    author_email="jim@zope.com",
+    author_email="zope-dev@zope.dev",
     description="ZC Buildout recipe for defining Zope 3 applications",
     license="ZPL 2.1",
     keywords="zope3 buildout",
@@ -42,18 +45,20 @@ setup(
         ' Detailed Documentation\n'
         '========================\n'
         + '\n' +
-        read('zc', 'zope3recipes', 'README.rst').split('\n\n', 1)[1]
+        read('src', 'zc', 'zope3recipes', 'README.rst').split('\n\n', 1)[1]
     ),
-    packages=find_packages('.'),
+    packages=find_packages('src'),
+    package_dir={'': 'src'},
     include_package_data=True,
     namespace_packages=['zc'],
+    python_requires='>=3.7',
     install_requires=[
-        'six',
         'zc.buildout >= 1.2.0',
         'zope.testing',
         'setuptools',
         'zc.recipe.egg >= 1.2.0',
         'ZConfig >= 2.4a5',
+        "pywin32 ; platform_system=='Windows'",
     ],
     entry_points={
         'zc.buildout': [
@@ -65,7 +70,7 @@ setup(
          ],
     },
     extras_require=dict(
-        tests=[
+        test=[
             'zdaemon >= 3.0.0',
             'zc.recipe.filestorage',
             'PasteScript',
@@ -78,10 +83,10 @@ setup(
         "License :: OSI Approved :: Zope Public License",
         "Topic :: Software Development :: Build Tools",
         "Topic :: Software Development :: Libraries :: Python Modules",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
 )

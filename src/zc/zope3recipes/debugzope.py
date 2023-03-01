@@ -18,10 +18,9 @@ import os
 import sys
 import traceback
 
-import six
-import zope.app.debug
 import zope.app.appsetup.interfaces
 import zope.app.appsetup.product
+import zope.app.debug
 from zope.event import notify
 
 
@@ -49,9 +48,9 @@ def zglobals(options):
         try:
             with open(startup) as f:
                 globs["__file__"] = startup
-                six.exec_(f.read(), globs)
+                exec(f.read(), globs)
                 del globs["__file__"]
-        except (OSError, IOError):
+        except OSError:
             # Not readable or not there, which is allowed.
             pass
 
@@ -88,7 +87,7 @@ def debug(args=None, main_module=None):
         globs['__file__'] = sys.argv[0]
         with open(sys.argv[0]) as f:
             code = compile(f.read(), sys.argv[0], 'exec')
-            six.exec_(code, globs)
+            exec(code, globs)
         sys.exit()
     else:
         import code

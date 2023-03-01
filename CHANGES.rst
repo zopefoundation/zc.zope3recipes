@@ -2,10 +2,14 @@
  Releases
 ==========
 
-0.20.1 (unreleased)
-===================
+1.0 (unreleased)
+================
 
-- Nothing changed yet.
+- Add support for Python 3.9, 3.10, 3.11.
+
+- Drop support for Python 2.7, 3.5, 3.6.
+
+- Drop Windows support due to lack of maintainer interest.
 
 
 0.20.0 (2021-04-16)

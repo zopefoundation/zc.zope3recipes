@@ -1,0 +1,33 @@
+# Generated from:
+# https://github.com/zopefoundation/meta/tree/master/config/buildout-recipe
+[meta]
+template = "buildout-recipe"
+commit-id = "039702ef"
+
+[python]
+with-sphinx-doctests = false
+with-future-python = false
+with-pypy = false
+with-macos = false
+with-windows = false
+
+[tox]
+use-flake8 = true
+testenv-deps = [
+    "zope.testrunner",
+    ]
+
+[coverage]
+fail-under = 52
+
+[flake8]
+additional-config = [
+    "# F821 undefined name",
+    "per-file-ignores =",
+    "    src/zc/zope3recipes/tests.py: F821",
+    ]
+
+[manifest]
+additional-rules = [
+    "recursive-include src *.rst",
+    ]
