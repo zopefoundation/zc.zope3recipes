@@ -306,8 +306,8 @@ checker = renormalizing.RENormalizing([
 
                 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
                 Please avoid running ``setup.py`` and ``easy_install``.
-                Instead, use pypa/build, pypa/installer, pypa/build or
-                other standards-based tools.
+                Instead, use pypa/build, pypa/installer or other
+                standards-based tools.
 
                 See https://github.com/pypa/setuptools/issues/917 for details.
                 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
@@ -319,8 +319,8 @@ checker = renormalizing.RENormalizing([
 
                 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
                 Please avoid running ``setup.py`` directly.
-                Instead, use pypa/build, pypa/installer, pypa/build or
-                other standards-based tools.
+                Instead, use pypa/build, pypa/installer or other
+                standards-based tools.
 
                 See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
                 \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
