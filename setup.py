@@ -51,7 +51,7 @@ setup(
     package_dir={'': 'src'},
     include_package_data=True,
     namespace_packages=['zc'],
-    python_requires='>=3.7',
+    python_requires='>=3.8',
     install_requires=[
         'zc.buildout >= 1.2.0',
         'zope.testing',
@@ -83,10 +83,10 @@ setup(
         "License :: OSI Approved :: Zope Public License",
         "Topic :: Software Development :: Build Tools",
         "Topic :: Software Development :: Libraries :: Python Modules",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
 )
